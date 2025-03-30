@@ -1,7 +1,17 @@
 package Commands;
 
-import Objects.ResultObject;
+import Objects.ResultDTO;
 
-public interface Command {
-    ResultObject execute();
+public abstract class Command {
+    private final String[] args;
+
+    public Command(String[] args) {
+        this.args = args;
+    }
+
+    public String[] getArgs() {
+        return args;
+    }
+
+    abstract public ResultDTO execute();
 }

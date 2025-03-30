@@ -1,21 +1,28 @@
 import Commands.Command;
-import Objects.CommandInfoObject;
-import Objects.ResultObject;
+import Objects.CommandInfoDTO;
+import Objects.ResultDTO;
 
 
 public class CommandHandler {
-    public static void executeCommand(CommandInfoObject commandInfoObject) {
+
+    /**
+     * Votab commandInfoDTO-st commandi ja argumendid. Loob uue command isendi ja saadab selle CommandFactorysse.
+     * Seejarel executib commandi ja salvestab tulemuse resultDTO objekti, mille pohjal otsustab mida kasutajale valjastada.
+     * @param commandInfoDTO
+     * return void
+     */
+    public static void executeCommand(CommandInfoDTO commandInfoDTO) {
         try {
-            String commandName = commandInfoObject.command();
-            String arg = commandInfoObject.args(); // muutsin ara et commandinfoObjecti sisend on String mitte String[]
-            Command command = CommandFactory.createCommand(commandName, arg);
-            ResultObject result = command.execute();
+            String commandName = commandInfoDTO.command();
+            String[] args = commandInfoDTO.args();
+            Command command = CommandFactory.createCommand(commandName, args);
+            ResultDTO result = command.execute();
 
             if (result.isSuccess()) {
-                System.out.println("TOOTAB " + result.message());
+                System.out.println("TOOTAB " + result.message() + "\n");
             }
             else {
-                System.out.println("ei toota " + result.message());
+                System.out.println("ei toota " + result.message() + "\n");
             }
         } catch (Exception e) {
             System.out.println(":( " + e.getMessage());

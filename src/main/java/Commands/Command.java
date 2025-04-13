@@ -10,6 +10,7 @@ public abstract class Command {
     }
 
     public String[] getArgs() {
+        System.out.println("testing");
         return args;
     }
 

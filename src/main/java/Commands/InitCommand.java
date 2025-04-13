@@ -4,8 +4,8 @@ import Objects.MiniGitRepository;
 import Objects.ResultDTO;
 
 import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
+import static UtilityMethods.CreateGitSubdirectories.createGitSubdirectories;
 
 public class InitCommand extends Command {
 
@@ -15,6 +15,7 @@ public class InitCommand extends Command {
 
     /**
      * executib commandi ja tagastab resultDTO objekti
+     *
      * @return resultDTO objekt
      */
     @Override
@@ -33,6 +34,7 @@ public class InitCommand extends Command {
 
     /**
      * loob antud kausta .mgit kausta ja sinna sisse vajalikud alamkaustad
+     *
      * @param path kaust kuhu luua .mgit
      * @return
      */
@@ -65,23 +67,5 @@ public class InitCommand extends Command {
         return repo;
     }
 
-    /**
-     * Teeb antud pathist ja lisatud pathidest kokku yhe pathi
-     * @param GitDirPath Juurpath
-     * @param path loodavad kaustad
-     * @return Fail objekt loodud pathist
-     */
-    public static File repoFile(Path GitDirPath, String... path) {
-        return GitDirPath.resolve(Paths.get("", path)).toFile();
-    }
 
-    /**
-     * teeb vastava nimega alamkausta
-     * @param GitDirFile kaust kuhu teha kaust
-     * @param path alamkaustad mida teha, voib anda mitu kausta siis tehakse yksteise sisse
-     */
-    private static void createGitSubdirectories(File GitDirFile, String... path) {
-        File subFile = repoFile(GitDirFile.toPath(), path);
-        if (!subFile.mkdirs()) throw new RuntimeException("Failed to create subdirectory at path: " + subFile);
-    }
 }

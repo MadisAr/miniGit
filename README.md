@@ -1,3 +1,5 @@
+![test badge](https://github.com/MadisAr/miniGit/actions/workflows/ci.yml/badge.svg)
+
 # miniGit
 Lihtne Giti kloon lokaalseks koodi haldamiseks.
 

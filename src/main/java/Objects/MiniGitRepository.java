@@ -18,8 +18,4 @@ public class MiniGitRepository {
         this.workTree = path;
         this.gitDir = Paths.get(path, ".mgit").toString();
     }
-
-    public static void main(String[] args) {
-        MiniGitRepository m =  new MiniGitRepository("\\c\\Users\\madismii\\UT\\oop\\miniGit");
-    }
 }

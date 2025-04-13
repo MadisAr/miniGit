@@ -1,20 +1,23 @@
 package Commands;
 
-import Objects.ResultObject;
+import Objects.ResultDTO;
 
-public class CommitCommand implements Command {
-    private String message;
+public class CommitCommand extends Command {
 
+    /**
+    * Vaatab et argumendid poleks tyhjad ning et argumentide listis oleks vahemalt yks element.
+     * @return ResultDTO objekt, mis kannab endaga kaasas vastavaid vaartuseid
+     */
     @Override
-    public ResultObject execute() {
-        if (message == null || message.isEmpty()) {
-            return new ResultObject(false, "Commit message is required", "null");
+    public ResultDTO execute() {
+        if (super.getArgs() == null || super.getArgs().length == 0) {
+            return new ResultDTO(false, "Commit message is required", "null");
         }
 
-        return new ResultObject(true, "Commit successful", "hash??");
+        return new ResultDTO(true, "Commit successful", "hash??");
     }
 
-    public CommitCommand(String message) {
-        this.message = message;
+    public CommitCommand(String[] args) {
+        super(args);
     }
 }

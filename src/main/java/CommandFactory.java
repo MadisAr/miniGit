@@ -1,12 +1,21 @@
 import Commands.*;
 
 public class CommandFactory {
-    public static Command createCommand(String commandName, String arg) throws Exception {
+    /**
+     * Teeb antud command name'ist vastava nimega Command classi
+     * @param commandName commandi nimi
+     * @param arg lisaargumentide list
+     * @return vastava Command isendi
+     */
+    public static Command createCommand(String commandName, String[] arg) {
 
-        if (commandName.equals("commit")) {
-            return new CommitCommand(arg);
-        }
-
-        return null;
+        return switch (commandName) {
+            case "commit" -> new CommitCommand(arg);
+            case "init" -> new InitCommand(arg);
+            default -> {
+                System.out.println("not working");
+                yield null;
+            }
+        };
     }
 }

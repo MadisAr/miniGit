@@ -1,8 +1,10 @@
 import Objects.MGitObject;
 import Objects.MiniGitRepository;
 import UtilityMethods.ReadObject;
+import UtilityMethods.WriteObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mockito;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -10,7 +12,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.security.NoSuchAlgorithmException;
 import java.util.zip.DeflaterOutputStream;
+
+import static UtilityMethods.WriteObject.writeObject;
+import static org.mockito.Mockito.when;
 
 
 class Tests {
@@ -55,5 +61,23 @@ class Tests {
         // vaatame et sisud oleksid samavaarsed ja et pikkus oleks ka sama
         assert result.getContent().equals(content);
         assert Integer.parseInt(result.getSize()) == content.length();
+    }
+
+    @Test
+    void testWriteObject() throws IOException, NoSuchAlgorithmException {
+        String testData = "TestDataString";
+//        File gitDir = new File(repoDir, ".mgit");
+
+        MiniGitRepository mockRepo = Mockito.mock(MiniGitRepository.class);
+        MGitObject mockMGitObject = Mockito.mock(MGitObject.class);
+
+        when(mockMGitObject.serialize(mockRepo)).thenReturn(testData);
+        when(mockMGitObject.getFormat()).thenReturn("Commit");
+        when(mockRepo.getGitDir()).thenReturn(tempDir.toString());
+
+        String sha = writeObject(mockRepo, mockMGitObject);
+        MGitObject mgitObject = ReadObject.ReadObject(mockRepo, sha);
+
+        assert mgitObject.getContent().equals(testData);
     }
 }

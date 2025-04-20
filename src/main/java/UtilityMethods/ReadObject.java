@@ -30,12 +30,12 @@ public class ReadObject {
 
         // loe baidireast objekti tyyp/format
         int spaceIndex = findFirstChar(decompressedBytes, (byte) ' ', 0);
-        String format = new String(decompressedBytes, 0, spaceIndex, StandardCharsets.US_ASCII);
+        String format = new String(decompressedBytes, 0, spaceIndex, StandardCharsets.UTF_8);
 
         // loeme baidireast objekti pikkuse ja valideerime selle
         int nullIndex = findFirstChar(decompressedBytes, (byte) 0, spaceIndex + 1);
 
-        int size = Integer.parseInt(new String(decompressedBytes, spaceIndex + 1, nullIndex - spaceIndex - 1, StandardCharsets.US_ASCII));
+        int size = Integer.parseInt(new String(decompressedBytes, spaceIndex + 1, nullIndex - spaceIndex - 1, StandardCharsets.UTF_8));
 
         // valideerime pikkuse, vorreldes sha header vaartust ja tegelikku content valja pikkust
         byte[] content = new byte[decompressedBytes.length - nullIndex - 1];

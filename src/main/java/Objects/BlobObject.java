@@ -1,6 +1,6 @@
 package Objects;
 
-public class BlobObject extends MGitObject{
+public class BlobObject extends MGitObject {
     String format = "blob"; // lopuks akki teeme baitidega
 
 
@@ -9,8 +9,8 @@ public class BlobObject extends MGitObject{
     }
 
     @Override
-    public void serialize(MiniGitRepository repo) {
-
+    public String serialize(MiniGitRepository repo) {
+        return null;
     }
 
     @Override

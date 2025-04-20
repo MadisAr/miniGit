@@ -3,6 +3,8 @@ package Objects;
 public abstract class MGitObject {
     String size;
     String content;
+    String format; // kuidagi peab implementima selle sisseandmise ka...
+
 
     public MGitObject(String data) { // hetkel argument string, ei pruugi oige olla
         // ajutine info testimiseks
@@ -18,7 +20,7 @@ public abstract class MGitObject {
         }
     }
 
-    public abstract void serialize(MiniGitRepository repo);
+    public abstract String serialize(MiniGitRepository repo);
 
     public abstract void deserialize(String data);
 
@@ -28,5 +30,9 @@ public abstract class MGitObject {
 
     public String getContent() {
         return this.content;
+    }
+
+    public String getFormat() {
+        return format;
     }
 }

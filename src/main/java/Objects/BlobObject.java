@@ -10,10 +10,11 @@ public class BlobObject extends MGitObject {
 
     @Override
     public String serialize(MiniGitRepository repo) {
-        return null;
+        return content;
     }
 
     @Override
     public void deserialize(String data) {
+        this.content = data;
     }
 }

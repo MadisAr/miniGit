@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.util.zip.InflaterInputStream;
 
 import static UtilityMethods.CreateGitSubdirectories.repoFile;
+import static UtilityMethods.FindFirstChar.findFirstChar;
 
 public class ReadObject {
     public static MGitObject ReadObject(MiniGitRepository miniGitRepository, String sha) throws IOException {
@@ -63,16 +64,6 @@ public class ReadObject {
             }
             return baos.toByteArray();
         }
-    }
-
-    private static int findFirstChar(byte[] data, byte x, int start) {
-
-        for (int i = start; i < data.length; i++) {
-            if (data[i] == x) {
-                return i;
-            }
-        }
-        return -1;
     }
 
 

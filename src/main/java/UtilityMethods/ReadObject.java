@@ -1,8 +1,8 @@
 package UtilityMethods;
 
-import Commands.CommitCommand;
-import Objects.BlobObject;
-import Objects.MGitObject;
+import Objects.MGitObjects.BlobObject;
+//import Objects.MGitObjects.CommitObject;
+import Objects.MGitObjects.MGitObject;
 import Objects.MiniGitRepository;
 
 import java.io.ByteArrayInputStream;
@@ -49,7 +49,15 @@ public class ReadObject {
         System.out.println("size: " + size);
         System.out.println("content: " + new String(content, StandardCharsets.US_ASCII));
 
-        return new BlobObject(size + " " + new String(content, StandardCharsets.US_ASCII));
+        String data = size + " " + new String(content, StandardCharsets.US_ASCII);
+        switch (format) {
+            case "blob":
+                return new BlobObject(data);
+//            case "commit":
+//                return new CommitObject(data);
+        }
+
+        return null;
     }
 
     public static byte[] decompress(byte[] data) throws IOException {

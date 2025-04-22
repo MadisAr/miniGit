@@ -1,5 +1,6 @@
 package UtilityMethods;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,10 +11,11 @@ public class KvlmParse {
      * commit messageites võib olla ka pgp signatuur aga ma praegu mõtlen, et meil ei ole seda vaja
      * kui tahame saame hiljem lisada
      *
-     * @param data etteantud andmed
+     * @param rawData etteantud andmed
      * @return tagastab mapi antud datast
      */
-    public static Map<String, String> KvlmParse(String data) {
+    public static Map<String, String> KvlmParse(byte[] rawData) {
+        String data = new String(rawData, StandardCharsets.UTF_8);
         Map<String, String> dataMap = new HashMap<>();
         String[] dataList = data.split("\n");
 

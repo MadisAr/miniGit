@@ -1,7 +1,8 @@
-import Objects.MGitObject;
+//import Objects.MGitObjects.CommitObject;
+import Objects.MGitObjects.CommitObject;
+import Objects.MGitObjects.MGitObject;
 import Objects.MiniGitRepository;
 import UtilityMethods.ReadObject;
-import UtilityMethods.WriteObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
@@ -60,7 +61,7 @@ class Tests {
 
         // vaatame et sisud oleksid samavaarsed ja et pikkus oleks ka sama
         assert result.getContent().equals(content);
-        assert Integer.parseInt(result.getSize()) == content.length();
+        assert result.getSize() == content.length();
     }
 
     @Test
@@ -72,12 +73,28 @@ class Tests {
         MGitObject mockMGitObject = Mockito.mock(MGitObject.class);
 
         when(mockMGitObject.serialize(mockRepo)).thenReturn(testData);
-        when(mockMGitObject.getFormat()).thenReturn("Commit");
+        when(mockMGitObject.getFormat()).thenReturn("blob");
         when(mockRepo.getGitDir()).thenReturn(tempDir.toString());
 
         String sha = writeObject(mockRepo, mockMGitObject);
         MGitObject mgitObject = ReadObject.ReadObject(mockRepo, sha);
 
         assert mgitObject.getContent().equals(testData);
+    }
+
+
+    @Test
+    void testCommitObject() {
+        String gitCommitMessage = "tree 29ff16c9c14e2652b22f8b78bb08a5a07930c147\n" +
+                "parent 206941306e8a8af65b66eaaaea388a7ae24d49a0\n" +
+                "author Maizi Pulgad <maizipulgad@thb.lt> 1527025023 +0200\n" +
+                "committer Maizi Pulgad <maizipulgad@thb.lt> 1527025044 +0200\n" +
+                "\n" +
+                "Test commit sonum";
+        CommitObject commitObject = new CommitObject(gitCommitMessage);
+
+        assert commitObject.getContent().get("message").equals("Test commit sonum");
+        assert commitObject.getSize() == "Test commit sonum".length();
+        assert commitObject.getFormat().equals("commit");
     }
 }

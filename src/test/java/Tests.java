@@ -1,7 +1,9 @@
 //import Objects.MGitObjects.CommitObject;
+
 import Objects.MGitObjects.CommitObject;
 import Objects.MGitObjects.MGitObject;
 import Objects.MiniGitRepository;
+import UtilityMethods.KvlmParse;
 import UtilityMethods.ReadObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -14,6 +16,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 import java.util.zip.DeflaterOutputStream;
 
 import static UtilityMethods.WriteObject.writeObject;
@@ -82,6 +85,21 @@ class Tests {
         assert mgitObject.getContent().equals(testData);
     }
 
+    @Test
+    void testKvlmParseUnparse() {
+        String gitCommitMessage = "tree 29ff16c9c14e2652b22f8b78bb08a5a07930c147\n" +
+                "parent 206941306e8a8af65b66eaaaea388a7ae24d49a0\n" +
+                "author Maizi Pulgad <maizipulgad@thb.lt> 1527025023 +0200\n" +
+                "committer Maizi Pulgad <maizipulgad@thb.lt> 1527025044 +0200\n" +
+                "\n" +
+                "Test commit sonum";
+
+        Map<String, String> vals = KvlmParse.KvlmParse(gitCommitMessage.getBytes(StandardCharsets.UTF_8));
+        String unParsed = new String(KvlmParse.KvlmUnParse(vals), StandardCharsets.UTF_8);
+
+        assert vals.get("message").equals("Test commit sonum");
+        assert gitCommitMessage.equals(unParsed);
+    }
 
     @Test
     void testCommitObject() {
@@ -93,6 +111,9 @@ class Tests {
                 "Test commit sonum";
         CommitObject commitObject = new CommitObject(gitCommitMessage);
 
+        System.out.println("test");
+        String x = new String(KvlmParse.KvlmUnParse(commitObject.getContent()));
+        System.out.println("tete");
         assert commitObject.getContent().get("message").equals("Test commit sonum");
         assert commitObject.getSize() == "Test commit sonum".length();
         assert commitObject.getFormat().equals("commit");

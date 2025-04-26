@@ -67,7 +67,7 @@ class Tests {
             dos.write(rawContent.toByteArray());
         }
 
-        MGitObject result = ReadObject.ReadObject(repo, testSha);
+        MGitObject result = ReadObject.readObject(repo, testSha);
 
         // vaatame et sisud oleksid samavaarsed ja et pikkus oleks ka sama
         assert result.getContent().equals(content);
@@ -87,7 +87,7 @@ class Tests {
         when(mockRepo.getGitDir()).thenReturn(tempDir.toString());
 
         String sha = writeObject(mockRepo, mockMGitObject);
-        MGitObject mgitObject = ReadObject.ReadObject(mockRepo, sha);
+        MGitObject mgitObject = ReadObject.readObject(mockRepo, sha);
 
         assert mgitObject.getContent().equals(testData);
     }

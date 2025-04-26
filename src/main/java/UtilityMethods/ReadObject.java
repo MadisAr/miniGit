@@ -4,6 +4,7 @@ import Objects.MGitObjects.BlobObject;
 //import Objects.MGitObjects.CommitObject;
 import Objects.MGitObjects.CommitObject;
 import Objects.MGitObjects.MGitObject;
+import Objects.MGitObjects.TreeObject;
 import Objects.MiniGitRepository;
 
 import java.io.ByteArrayInputStream;
@@ -18,7 +19,7 @@ import static UtilityMethods.CreateGitSubdirectories.repoFile;
 import static UtilityMethods.FindFirstChar.findFirstChar;
 
 public class ReadObject {
-    public static MGitObject ReadObject(MiniGitRepository miniGitRepository, String sha) throws IOException {
+    public static MGitObject readObject(MiniGitRepository miniGitRepository, String sha) throws IOException {
         // teeme sha alamkaustad
         File repoFile = new File(miniGitRepository.getGitDir());
         File shaFile = repoFile(repoFile.toPath(), "objects", sha.substring(0, 2), sha.substring(2));
@@ -56,6 +57,8 @@ public class ReadObject {
                 return new BlobObject(data);
             case "commit":
                 return new CommitObject(data);
+            case "tree":
+                return new TreeObject(data);
         }
 
         return null;

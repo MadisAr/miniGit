@@ -26,8 +26,8 @@ public class TreeObject extends MGitObject{
     }
 
     @Override
-    public Object getContent() {
-        return null;
+    public List<TreeDTO> getContent() {
+        return items;
     }
 
     @Override

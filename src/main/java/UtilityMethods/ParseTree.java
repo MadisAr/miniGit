@@ -1,12 +1,18 @@
 package UtilityMethods;
 
 import Objects.TreeDTO;
+import com.sun.source.tree.Tree;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
+import java.util.*;
 
 // funktsioonid gitTreeObjekti decodimiseks ja loomiseks
 // struktuur on nt byteid: 100644 path 0byte sha-1
@@ -15,30 +21,61 @@ import java.util.Arrays;
 // info pathi kohta
 // null byte
 // sha1 encoditud info
+
 public class ParseTree {
+
+    public static List<TreeDTO> parseTree(byte[] treeBytes) {
+        // skipib yle esimese 9 byte'i kus on kirjas objekti tyyp ja pikkus
+        int position = 9;
+        int length = treeBytes.length;
+        List<TreeDTO> returnList = new ArrayList<>();
+        TreeDTO treeDTO;
+
+        while ((treeDTO = decodeTreeSHA(treeBytes, position)) != null) {
+            returnList.add(treeDTO);
+            position += treeDTO.dataLength();
+        }
+        return returnList;
+    }
+
+    public static Comparator<TreeDTO> treeDTOComparator = Comparator.comparing(treeDTO -> {
+        if (treeDTO.mode()[0] == (byte) 1 && treeDTO.mode()[1] == (byte) 0) {
+            return new String(treeDTO.path());
+        } else {
+            return new String(treeDTO.path()) + "/";
+        }
+    });
+
+
     /**
      * loeb byte'id ja tagastab nendest saadud TreeDTO
      *
      * @param treeBytes antud byte array mgit Tree objektist
      * @return tagastab TreeDTO, kust saab infot mugavalt valja lugeda
      */
-    public static TreeDTO decodeTreeSHA(byte[] treeBytes) {
-        int spaceInd = FindFirstChar.findFirstChar(treeBytes, (byte) ' ', 0);
+    public static TreeDTO decodeTreeSHA(byte[] treeBytes, int pos) {
+        if (pos >= treeBytes.length) return null;
+
+        int spaceInd = FindFirstChar.findFirstChar(treeBytes, (byte) ' ', pos);
         int nullInd = FindFirstChar.findFirstChar(treeBytes, (byte) 0, spaceInd);
 
-        if (nullInd == -1 || spaceInd == -1) return null;
-        byte[] modeBytes = Arrays.copyOfRange(treeBytes, 0, spaceInd);
-        byte[] pathBytes = Arrays.copyOfRange(treeBytes, spaceInd, nullInd);
-        byte[] shaBytes = Arrays.copyOfRange(treeBytes, nullInd, treeBytes.length);
+        assert (spaceInd - pos == 5 || spaceInd - pos == 6);
 
-        return new TreeDTO(modeBytes, pathBytes, shaBytes);
+        if (nullInd == -1 || spaceInd == -1) return null;
+        byte[] modeBytes = Arrays.copyOfRange(treeBytes, pos, spaceInd);
+        byte[] pathBytes = Arrays.copyOfRange(treeBytes, spaceInd + 1, nullInd);
+        byte[] shaBytes = Arrays.copyOfRange(treeBytes, nullInd + 1, nullInd + 21);
+
+        String shaString = HexFormat.of().formatHex(shaBytes);
+
+        return new TreeDTO(modeBytes, pathBytes, shaString);
     }
 
     /**
      * Votab hetkel sisse numbri Stringi path ja SHA-1 byted ja teeb neist kokku yhe listi
      *
-     * @param nr info failityybi kohta
-     * @param path info pathi kohta
+     * @param nr       info failityybi kohta
+     * @param path     info pathi kohta
      * @param shaBytes krypteeritud sha byte'id
      * @return tagastab byte array
      */

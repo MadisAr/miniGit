@@ -3,7 +3,9 @@
 import Objects.MGitObjects.CommitObject;
 import Objects.MGitObjects.MGitObject;
 import Objects.MiniGitRepository;
+import Objects.TreeDTO;
 import UtilityMethods.KvlmParse;
+import UtilityMethods.ParseTree;
 import UtilityMethods.ReadObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -13,9 +15,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.zip.DeflaterOutputStream;
 
@@ -117,5 +124,17 @@ class Tests {
         assert commitObject.getContent().get("message").equals("Test commit sonum");
         assert commitObject.getSize() == "Test commit sonum".length();
         assert commitObject.getFormat().equals("commit");
+    }
+
+    @Test
+    void TestParse() throws IOException, URISyntaxException {
+        Path p = Paths.get(getClass().getClassLoader()
+                .getResource("71/f40b7bafe4d0bb87c752dd52f9c47db21f56a6")
+                .toURI());
+        byte[] bytes = Files.readAllBytes(p);
+        bytes = ReadObject.decompress(bytes);
+        List<TreeDTO> info = ParseTree.parseTree(bytes);
+        assert Arrays.equals(info.getFirst().mode(), "100644".getBytes());
+        assert Arrays.equals(info.getFirst().path(), "ArgParser.java".getBytes());
     }
 }

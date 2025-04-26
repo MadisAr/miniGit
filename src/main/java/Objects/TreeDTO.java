@@ -1,4 +1,7 @@
 package Objects;
 
-public record TreeDTO(byte[] mode, byte[] path, byte[] sha) {
+public record TreeDTO(byte[] mode, byte[] path, String sha) {
+    public int dataLength() {
+        return mode.length + path.length + 22;
+    }
 }

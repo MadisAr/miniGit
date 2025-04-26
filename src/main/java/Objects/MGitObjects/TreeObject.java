@@ -1,9 +1,15 @@
 package Objects.MGitObjects;
 
 import Objects.MiniGitRepository;
+import Objects.TreeDTO;
+import UtilityMethods.ParseTree;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class TreeObject extends MGitObject{
     private final String format = "tree";
+    private List<TreeDTO> items = new ArrayList<>();
 
     public TreeObject(String data) {
         super(data);
@@ -11,12 +17,12 @@ public class TreeObject extends MGitObject{
 
     @Override
     public String serialize(MiniGitRepository repo) {
-        return "";
+        return ""; // todo hetkel katki vist
     }
 
     @Override
     public void deserialize(String data) {
-
+        this.items = ParseTree.parseTree(data.getBytes());
     }
 
     @Override

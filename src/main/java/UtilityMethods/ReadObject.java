@@ -1,8 +1,8 @@
 package UtilityMethods;
 
-import Commands.CommitCommand;
-import Objects.BlobObject;
-import Objects.MGitObject;
+import Objects.MGitObjects.BlobObject;
+//import Objects.MGitObjects.CommitObject;
+import Objects.MGitObjects.MGitObject;
 import Objects.MiniGitRepository;
 
 import java.io.ByteArrayInputStream;
@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.util.zip.InflaterInputStream;
 
 import static UtilityMethods.CreateGitSubdirectories.repoFile;
+import static UtilityMethods.FindFirstChar.findFirstChar;
 
 public class ReadObject {
     public static MGitObject ReadObject(MiniGitRepository miniGitRepository, String sha) throws IOException {
@@ -30,12 +31,12 @@ public class ReadObject {
 
         // loe baidireast objekti tyyp/format
         int spaceIndex = findFirstChar(decompressedBytes, (byte) ' ', 0);
-        String format = new String(decompressedBytes, 0, spaceIndex, StandardCharsets.US_ASCII);
+        String format = new String(decompressedBytes, 0, spaceIndex, StandardCharsets.UTF_8);
 
         // loeme baidireast objekti pikkuse ja valideerime selle
         int nullIndex = findFirstChar(decompressedBytes, (byte) 0, spaceIndex + 1);
 
-        int size = Integer.parseInt(new String(decompressedBytes, spaceIndex + 1, nullIndex - spaceIndex - 1, StandardCharsets.US_ASCII));
+        int size = Integer.parseInt(new String(decompressedBytes, spaceIndex + 1, nullIndex - spaceIndex - 1, StandardCharsets.UTF_8));
 
         // valideerime pikkuse, vorreldes sha header vaartust ja tegelikku content valja pikkust
         byte[] content = new byte[decompressedBytes.length - nullIndex - 1];
@@ -48,7 +49,15 @@ public class ReadObject {
         System.out.println("size: " + size);
         System.out.println("content: " + new String(content, StandardCharsets.US_ASCII));
 
-        return new BlobObject(size + " " + new String(content, StandardCharsets.US_ASCII));
+        String data = size + " " + new String(content, StandardCharsets.US_ASCII);
+        switch (format) {
+            case "blob":
+                return new BlobObject(data);
+//            case "commit":
+//                return new CommitObject(data);
+        }
+
+        return null;
     }
 
     public static byte[] decompress(byte[] data) throws IOException {
@@ -63,16 +72,6 @@ public class ReadObject {
             }
             return baos.toByteArray();
         }
-    }
-
-    private static int findFirstChar(byte[] data, byte x, int start) {
-
-        for (int i = start; i < data.length; i++) {
-            if (data[i] == x) {
-                return i;
-            }
-        }
-        return -1;
     }
 
 

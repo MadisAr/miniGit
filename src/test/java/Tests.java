@@ -1,8 +1,13 @@
-import Objects.MGitObject;
+//import Objects.MGitObjects.CommitObject;
+
+import Objects.MGitObjects.CommitObject;
+import Objects.MGitObjects.MGitObject;
 import Objects.MiniGitRepository;
+import UtilityMethods.KvlmParse;
 import UtilityMethods.ReadObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mockito;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -10,7 +15,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 import java.util.zip.DeflaterOutputStream;
+
+import static UtilityMethods.WriteObject.writeObject;
+import static org.mockito.Mockito.when;
 
 
 class Tests {
@@ -54,6 +64,58 @@ class Tests {
 
         // vaatame et sisud oleksid samavaarsed ja et pikkus oleks ka sama
         assert result.getContent().equals(content);
-        assert Integer.parseInt(result.getSize()) == content.length();
+        assert result.getSize() == content.length();
+    }
+
+    @Test
+    void testWriteObject() throws IOException, NoSuchAlgorithmException {
+        String testData = "TestDataString";
+//        File gitDir = new File(repoDir, ".mgit");
+
+        MiniGitRepository mockRepo = Mockito.mock(MiniGitRepository.class);
+        MGitObject mockMGitObject = Mockito.mock(MGitObject.class);
+
+        when(mockMGitObject.serialize(mockRepo)).thenReturn(testData);
+        when(mockMGitObject.getFormat()).thenReturn("blob");
+        when(mockRepo.getGitDir()).thenReturn(tempDir.toString());
+
+        String sha = writeObject(mockRepo, mockMGitObject);
+        MGitObject mgitObject = ReadObject.ReadObject(mockRepo, sha);
+
+        assert mgitObject.getContent().equals(testData);
+    }
+
+    @Test
+    void testKvlmParseUnparse() {
+        String gitCommitMessage = "tree 29ff16c9c14e2652b22f8b78bb08a5a07930c147\n" +
+                "parent 206941306e8a8af65b66eaaaea388a7ae24d49a0\n" +
+                "author Maizi Pulgad <maizipulgad@thb.lt> 1527025023 +0200\n" +
+                "committer Maizi Pulgad <maizipulgad@thb.lt> 1527025044 +0200\n" +
+                "\n" +
+                "Test commit sonum";
+
+        Map<String, String> vals = KvlmParse.KvlmParse(gitCommitMessage.getBytes(StandardCharsets.UTF_8));
+        String unParsed = new String(KvlmParse.KvlmUnParse(vals), StandardCharsets.UTF_8);
+
+        assert vals.get("message").equals("Test commit sonum");
+        assert gitCommitMessage.equals(unParsed);
+    }
+
+    @Test
+    void testCommitObject() {
+        String gitCommitMessage = "tree 29ff16c9c14e2652b22f8b78bb08a5a07930c147\n" +
+                "parent 206941306e8a8af65b66eaaaea388a7ae24d49a0\n" +
+                "author Maizi Pulgad <maizipulgad@thb.lt> 1527025023 +0200\n" +
+                "committer Maizi Pulgad <maizipulgad@thb.lt> 1527025044 +0200\n" +
+                "\n" +
+                "Test commit sonum";
+        CommitObject commitObject = new CommitObject(gitCommitMessage);
+
+        System.out.println("test");
+        String x = new String(KvlmParse.KvlmUnParse(commitObject.getContent()));
+        System.out.println("tete");
+        assert commitObject.getContent().get("message").equals("Test commit sonum");
+        assert commitObject.getSize() == "Test commit sonum".length();
+        assert commitObject.getFormat().equals("commit");
     }
 }

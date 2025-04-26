@@ -12,6 +12,7 @@ public class CommandFactory {
         return switch (commandName) {
             case "commit" -> new CommitCommand(arg);
             case "init" -> new InitCommand(arg);
+            case "checkout" -> new CheckoutCommand(arg);
             default -> {
                 System.out.println("not working");
                 yield null;

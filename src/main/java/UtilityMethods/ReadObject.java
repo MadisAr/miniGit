@@ -2,6 +2,7 @@ package UtilityMethods;
 
 import Objects.MGitObjects.BlobObject;
 //import Objects.MGitObjects.CommitObject;
+import Objects.MGitObjects.CommitObject;
 import Objects.MGitObjects.MGitObject;
 import Objects.MiniGitRepository;
 
@@ -53,8 +54,8 @@ public class ReadObject {
         switch (format) {
             case "blob":
                 return new BlobObject(data);
-//            case "commit":
-//                return new CommitObject(data);
+            case "commit":
+                return new CommitObject(data);
         }
 
         return null;

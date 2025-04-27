@@ -2,6 +2,8 @@ package Commands;
 
 import Objects.ResultDTO;
 
+import java.io.IOException;
+
 public abstract class Command {
     private final String[] args;
 
@@ -13,5 +15,5 @@ public abstract class Command {
         return args;
     }
 
-    abstract public ResultDTO execute();
+    abstract public ResultDTO execute() throws IOException;
 }

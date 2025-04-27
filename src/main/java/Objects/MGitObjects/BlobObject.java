@@ -7,7 +7,7 @@ public class BlobObject extends MGitObject {
     String content;
     Integer size;
 
-    public BlobObject(String data) {
+    public BlobObject(byte[] data) {
         super(data);
     }
 
@@ -31,9 +31,10 @@ public class BlobObject extends MGitObject {
     }
 
     @Override
-    public void deserialize(String data) {
-        this.content = data;
-        String[] stuff = data.split(" ", 2);
+    public void deserialize(byte[] data) {
+        String dataStr = new String(data);
+        this.content = dataStr;
+        String[] stuff = dataStr.split(" ", 2);
         this.size = Integer.valueOf(stuff[0]);
         this.content = stuff[1];
     }

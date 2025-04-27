@@ -25,9 +25,9 @@ import java.util.*;
 public class ParseTree {
 
     public static List<TreeDTO> parseTree(byte[] treeBytes) {
-        // skipib yle esimese 9 byte'i kus on kirjas objekti tyyp ja pikkus
-        int position = 9;
-        int length = treeBytes.length;
+        // skipib yle esimesed X byte'i kus on kirjas objekti tyyp ja pikkus
+        int position = 0;
+
         List<TreeDTO> returnList = new ArrayList<>();
         TreeDTO treeDTO;
 
@@ -57,11 +57,14 @@ public class ParseTree {
         if (pos >= treeBytes.length) return null;
 
         int spaceInd = FindFirstChar.findFirstChar(treeBytes, (byte) ' ', pos);
+        if (spaceInd == -1) return null;
+
         int nullInd = FindFirstChar.findFirstChar(treeBytes, (byte) 0, spaceInd);
+        if (nullInd == -1) return null;
 
-        assert (spaceInd - pos == 5 || spaceInd - pos == 6);
+        String x =new String(treeBytes);
+        assert (spaceInd - pos <= 7);
 
-        if (nullInd == -1 || spaceInd == -1) return null;
         byte[] modeBytes = Arrays.copyOfRange(treeBytes, pos, spaceInd);
         byte[] pathBytes = Arrays.copyOfRange(treeBytes, spaceInd + 1, nullInd);
         byte[] shaBytes = Arrays.copyOfRange(treeBytes, nullInd + 1, nullInd + 21);

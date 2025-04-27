@@ -11,11 +11,14 @@ import UtilityMethods.ReadObject;
 import com.sun.source.tree.Tree;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+// TODO teha nii et ei tule alati NULL lopuks return, praegu treecheckout errorid neelatakse alla
 public class CheckoutCommand extends Command {
 
     public CheckoutCommand(String[] args) {
@@ -23,49 +26,60 @@ public class CheckoutCommand extends Command {
     }
 
     @Override
-    public ResultDTO execute() {
-        return null;
+    public ResultDTO execute() throws IOException {
+        String result = commandCheckout(getArgs());
+        if (result == null) {
+            return new ResultDTO(true, "Checkout succesful, commit instantiated at " + getArgs()[1], null);
+        }
+        else {
+            return new ResultDTO(false, result, null);
+        }
     }
 
-    public static void commandCheckout(String[] args) throws IOException {
-        MiniGitRepository repo = CreateGitSubdirectories.repoFind(".");
-        if (repo == null) return;
+    public static String commandCheckout(String[] args) throws IOException {
+        MiniGitRepository repo = CreateGitSubdirectories.repoFind("");
+        if (repo == null) return "Couldn't find .mgit directory.";
 
-        CommitObject object = (CommitObject) ReadObject.readObject(repo, args[0]);
-        if (object == null) return;
+        CommitObject commitObject = (CommitObject) ReadObject.readObject(repo, args[0]);
+        if (commitObject == null) return "Couldn't find commit hash from .mgit directory.";
 
-        TreeObject object1 = (TreeObject) ReadObject.readObject(repo, object.getContent().get("tree"));
-        if (object1 == null) return;
+        TreeObject treeObject = (TreeObject) ReadObject.readObject(repo, commitObject.getContent().get("tree"));
+        if (treeObject == null) return "Something went wrong, sorry :)";
 
         Path path = Path.of(args[1]);
 
         if (Files.exists(path)) {
             if (!Files.isDirectory(path)) {
-                System.out.println("Not a directory " + args[1]);
+                return ".mgit is not a directory.";
             }
-//            if (Files.list(path) != null) {
-//                System.out.println("Directory not empty " + args[1]);
-//            }
-        }
-        else {
-            System.out.println("Doesn't exist:("); // teoorias voib teha hiljem selle et kui kausta pole siis teeb uue ja jatkab
-            return;
+            String[] files = path.toFile().list();
+            if (files != null && files.length != 0) {
+                return args[1] + " directory is not empty.";
+            }
+        } else {
+            return "Given directory " + args[1] + " doesn't exist.";
         }
 
-//        treeCheckout(repo, object1, args[1]);
+        return treeCheckout(repo, treeObject, args[1]);
     }
 
-//    public static void treeCheckout(MiniGitRepository repo, TreeObject tree, String path) throws IOException {
-//        for (TreeDTO o : tree.getContent()) {
-//            MGitObject obj = ReadObject.readObject(repo, o.sha());
-//            File dest = Paths.get(path).resolve(new String(o.path())).toFile();
-//
-//            if (obj.getFormat().equals("tree")) {
-//                dest.mkdir();
-//            }
-//            else if (obj.getFormat().equals("blob")) {
-//
-//            }
-//        }
-//    }
+    public static String treeCheckout(MiniGitRepository repo, TreeObject tree, String path) throws IOException {
+        for (TreeDTO o : tree.getContent()) {
+            MGitObject obj = ReadObject.readObject(repo, o.sha());
+            File dest = Paths.get(path).resolve(new String(o.path())).toFile();// vblla peaks olema global path?
+
+            if (obj.getFormat().equals("tree")) {
+                dest.mkdir();
+                treeCheckout(repo, (TreeObject) obj, dest.toString());
+            } else if (obj.getFormat().equals("blob")) {
+                String content = (String) obj.getContent();
+                try (FileWriter fileWriter = new FileWriter(dest)) {
+                    fileWriter.write(content);
+                } catch (IOException e) {
+                    return "Something went wrong with writing files.";
+                }
+            }
+        }
+        return null;
+    }
 }

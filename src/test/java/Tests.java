@@ -4,6 +4,7 @@ import Objects.MGitObjects.CommitObject;
 import Objects.MGitObjects.MGitObject;
 import Objects.MiniGitRepository;
 import Objects.TreeDTO;
+import UtilityMethods.FindFirstChar;
 import UtilityMethods.KvlmParse;
 import UtilityMethods.ParseTree;
 import UtilityMethods.ReadObject;
@@ -94,7 +95,7 @@ class Tests {
 
     @Test
     void testKvlmParseUnparse() {
-        String gitCommitMessage = "tree 29ff16c9c14e2652b22f8b78bb08a5a07930c147\n" +
+        String gitCommitMessage = "213 tree 29ff16c9c14e2652b22f8b78bb08a5a07930c147\n" +
                 "parent 206941306e8a8af65b66eaaaea388a7ae24d49a0\n" +
                 "author Maizi Pulgad <maizipulgad@thb.lt> 1527025023 +0200\n" +
                 "committer Maizi Pulgad <maizipulgad@thb.lt> 1527025044 +0200\n" +
@@ -105,18 +106,18 @@ class Tests {
         String unParsed = new String(KvlmParse.KvlmUnParse(vals), StandardCharsets.UTF_8);
 
         assert vals.get("message").equals("Test commit sonum");
-        assert gitCommitMessage.equals(unParsed);
+        assert (gitCommitMessage).equals("213 " +unParsed);
     }
 
     @Test
     void testCommitObject() {
-        String gitCommitMessage = "tree 29ff16c9c14e2652b22f8b78bb08a5a07930c147\n" +
+        String gitCommitMessage = "213 tree 29ff16c9c14e2652b22f8b78bb08a5a07930c147\n" +
                 "parent 206941306e8a8af65b66eaaaea388a7ae24d49a0\n" +
                 "author Maizi Pulgad <maizipulgad@thb.lt> 1527025023 +0200\n" +
                 "committer Maizi Pulgad <maizipulgad@thb.lt> 1527025044 +0200\n" +
                 "\n" +
                 "Test commit sonum";
-        CommitObject commitObject = new CommitObject(gitCommitMessage);
+        CommitObject commitObject = new CommitObject(gitCommitMessage.getBytes());
 
         System.out.println("test");
         String x = new String(KvlmParse.KvlmUnParse(commitObject.getContent()));
@@ -133,6 +134,7 @@ class Tests {
                 .toURI());
         byte[] bytes = Files.readAllBytes(p);
         bytes = ReadObject.decompress(bytes);
+        bytes = Arrays.copyOfRange(bytes, FindFirstChar.findFirstChar(bytes, (byte) 0, 0) + 1, bytes.length);
         List<TreeDTO> info = ParseTree.parseTree(bytes);
         assert Arrays.equals(info.getFirst().mode(), "100644".getBytes());
         assert Arrays.equals(info.getFirst().path(), "ArgParser.java".getBytes());

@@ -17,12 +17,12 @@ public class KvlmParse {
      */
     public static Map<String, String> KvlmParse(byte[] rawData) {
         String data = new String(rawData, StandardCharsets.UTF_8);
+        data = data.split(" ", 2)[1];
         Map<String, String> dataMap = new LinkedHashMap<>();
         String[] dataList = data.split("\n");
 
         //esimesed neli rida commitis on tree, parent author ja commiter, mis lisame loopiga
         for (int i = 0; i < 4; i++) {
-            System.out.println(dataList[i]);
             String[] entry = dataList[i].split(" ", 2);
             dataMap.put(entry[0], entry[1]);
         }
@@ -42,7 +42,6 @@ public class KvlmParse {
         }
         dataString.append("\n").append(vals[vals.length - 1]);
 
-        System.out.println(dataString);
         return dataString.toString().getBytes(StandardCharsets.UTF_8);
     }
 }

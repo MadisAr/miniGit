@@ -9,9 +9,9 @@ import java.util.List;
 
 public class TreeObject extends MGitObject{
     private final String format = "tree";
-    private List<TreeDTO> items = new ArrayList<>();
+    private List<TreeDTO> items;
 
-    public TreeObject(String data) {
+    public TreeObject(byte[] data) {
         super(data);
     }
 
@@ -21,8 +21,8 @@ public class TreeObject extends MGitObject{
     }
 
     @Override
-    public void deserialize(String data) {
-        this.items = ParseTree.parseTree(data.getBytes());
+    public void deserialize(byte[] data) {
+        this.items = ParseTree.parseTree(data);
     }
 
     @Override
@@ -37,6 +37,6 @@ public class TreeObject extends MGitObject{
 
     @Override
     public String getFormat() {
-        return "";
+        return format;
     }
 }

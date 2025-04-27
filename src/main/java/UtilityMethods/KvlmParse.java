@@ -23,7 +23,6 @@ public class KvlmParse {
 
         //esimesed neli rida commitis on tree, parent author ja commiter, mis lisame loopiga
         for (int i = 0; i < 4; i++) {
-            System.out.println(dataList[i]);
             String[] entry = dataList[i].split(" ", 2);
             dataMap.put(entry[0], entry[1]);
         }
@@ -43,7 +42,6 @@ public class KvlmParse {
         }
         dataString.append("\n").append(vals[vals.length - 1]);
 
-        System.out.println(dataString);
         return dataString.toString().getBytes(StandardCharsets.UTF_8);
     }
 }

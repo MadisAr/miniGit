@@ -4,6 +4,7 @@ import Objects.MGitObjects.CommitObject;
 import Objects.MGitObjects.MGitObject;
 import Objects.MiniGitRepository;
 import Objects.TreeDTO;
+import UtilityMethods.FindFirstChar;
 import UtilityMethods.KvlmParse;
 import UtilityMethods.ParseTree;
 import UtilityMethods.ReadObject;
@@ -116,7 +117,7 @@ class Tests {
                 "committer Maizi Pulgad <maizipulgad@thb.lt> 1527025044 +0200\n" +
                 "\n" +
                 "Test commit sonum";
-        CommitObject commitObject = new CommitObject(gitCommitMessage);
+        CommitObject commitObject = new CommitObject(gitCommitMessage.getBytes());
 
         System.out.println("test");
         String x = new String(KvlmParse.KvlmUnParse(commitObject.getContent()));
@@ -133,6 +134,7 @@ class Tests {
                 .toURI());
         byte[] bytes = Files.readAllBytes(p);
         bytes = ReadObject.decompress(bytes);
+        bytes = Arrays.copyOfRange(bytes, FindFirstChar.findFirstChar(bytes, (byte) 0, 0) + 1, bytes.length);
         List<TreeDTO> info = ParseTree.parseTree(bytes);
         assert Arrays.equals(info.getFirst().mode(), "100644".getBytes());
         assert Arrays.equals(info.getFirst().path(), "ArgParser.java".getBytes());

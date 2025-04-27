@@ -48,18 +48,20 @@ public class ReadObject {
         if (size != content.length) {
             throw new RuntimeException("Error: sha object " + sha + " header size doesn't match the actual length!");
         }
-        System.out.println("format: " + format);
-        System.out.println("size: " + size);
-        System.out.println("content: " + new String(content, StandardCharsets.US_ASCII));
 
-        String data = size + " " + new String(content, StandardCharsets.US_ASCII);
+//        System.out.println("format: " + format);
+//        System.out.println("size: " + size);
+//        System.out.println("content: " + new String(content, StandardCharsets.US_ASCII));
+//        System.out.println("___________________________________________________________");
+
+        String data = size + " " + new String(content, StandardCharsets.US_ASCII); // tegelt meie viga peaks vb ara votma sizei
         switch (format) {
             case "blob":
-                return new BlobObject(data);
+                return new BlobObject(data.getBytes());
             case "commit":
-                return new CommitObject(data);
+                return new CommitObject(data.getBytes());
             case "tree":
-                return new TreeObject(data);
+                return new TreeObject(content);
         }
 
         return null;

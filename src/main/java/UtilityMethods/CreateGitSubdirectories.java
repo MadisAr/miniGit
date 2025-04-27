@@ -34,7 +34,6 @@ public class CreateGitSubdirectories {
         while (current != null) {
             Path mgitDir = current.resolve(".mgit");
             if (Files.isDirectory(mgitDir)) {
-                System.out.println("leidsin");
                 return new MiniGitRepository(current.toString());
             }
             current = current.getParent();

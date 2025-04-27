@@ -18,6 +18,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+// TODO teha nii et ei tule alati NULL lopuks return, praegu treecheckout errorid neelatakse alla
 public class CheckoutCommand extends Command {
 
     public CheckoutCommand(String[] args) {
@@ -26,54 +27,59 @@ public class CheckoutCommand extends Command {
 
     @Override
     public ResultDTO execute() throws IOException {
-        ResultDTO resultDTO;
-
-        commandCheckout(getArgs());
-        return null;
+        String result = commandCheckout(getArgs());
+        if (result == null) {
+            return new ResultDTO(true, "Checkout succesful, commit instantiated at " + getArgs()[1], null);
+        }
+        else {
+            return new ResultDTO(false, result, null);
+        }
     }
 
-    public static void commandCheckout(String[] args) throws IOException {
+    public static String commandCheckout(String[] args) throws IOException {
         MiniGitRepository repo = CreateGitSubdirectories.repoFind("");
-        if (repo == null) return;
+        if (repo == null) return "Couldn't find .mgit directory.";
 
         CommitObject commitObject = (CommitObject) ReadObject.readObject(repo, args[0]);
-        if (commitObject == null) return;
+        if (commitObject == null) return "Couldn't find commit hash from .mgit directory.";
 
         TreeObject treeObject = (TreeObject) ReadObject.readObject(repo, commitObject.getContent().get("tree"));
-        if (treeObject == null) return;
+        if (treeObject == null) return "Something went wrong, sorry :)";
 
         Path path = Path.of(args[1]);
 
         if (Files.exists(path)) {
             if (!Files.isDirectory(path)) {
-                System.out.println("Not a directory " + args[1]);
+                return ".mgit is not a directory.";
             }
-//            if (Files.list(path) != null) {
-//                System.out.println("Directory not empty " + args[1]);
-//            }
+            String[] files = path.toFile().list();
+            if (files != null && files.length != 0) {
+                return args[1] + " directory is not empty.";
+            }
         } else {
-            System.out.println("Doesn't exist:("); // teoorias voib teha hiljem selle et kui kausta pole siis teeb uue ja jatkab
-            return;
+            return "Given directory " + args[1] + " doesn't exist.";
         }
 
-        treeCheckout(repo, treeObject, args[1]);
+        return treeCheckout(repo, treeObject, args[1]);
     }
 
-    public static void treeCheckout(MiniGitRepository repo, TreeObject tree, String path) throws IOException {
+    public static String treeCheckout(MiniGitRepository repo, TreeObject tree, String path) throws IOException {
         for (TreeDTO o : tree.getContent()) {
             MGitObject obj = ReadObject.readObject(repo, o.sha());
             File dest = Paths.get(path).resolve(new String(o.path())).toFile();// vblla peaks olema global path?
 
             if (obj.getFormat().equals("tree")) {
                 dest.mkdir();
+                treeCheckout(repo, (TreeObject) obj, dest.toString());
             } else if (obj.getFormat().equals("blob")) {
                 String content = (String) obj.getContent();
                 try (FileWriter fileWriter = new FileWriter(dest)) {
                     fileWriter.write(content);
                 } catch (IOException e) {
-                    System.out.println(e.getMessage());
+                    return "Something went wrong with writing files.";
                 }
             }
         }
+        return null;
     }
 }

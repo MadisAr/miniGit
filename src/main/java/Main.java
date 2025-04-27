@@ -2,7 +2,7 @@ import Objects.CommandInfoDTO;
 
 public class Main {
     public static void main(String[] args) {
-
+        System.out.println("tootab");
 
 
         try {

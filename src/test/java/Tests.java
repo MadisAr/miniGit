@@ -94,7 +94,7 @@ class Tests {
 
     @Test
     void testKvlmParseUnparse() {
-        String gitCommitMessage = "tree 29ff16c9c14e2652b22f8b78bb08a5a07930c147\n" +
+        String gitCommitMessage = "213 tree 29ff16c9c14e2652b22f8b78bb08a5a07930c147\n" +
                 "parent 206941306e8a8af65b66eaaaea388a7ae24d49a0\n" +
                 "author Maizi Pulgad <maizipulgad@thb.lt> 1527025023 +0200\n" +
                 "committer Maizi Pulgad <maizipulgad@thb.lt> 1527025044 +0200\n" +
@@ -105,12 +105,12 @@ class Tests {
         String unParsed = new String(KvlmParse.KvlmUnParse(vals), StandardCharsets.UTF_8);
 
         assert vals.get("message").equals("Test commit sonum");
-        assert gitCommitMessage.equals(unParsed);
+        assert (gitCommitMessage).equals("213 " +unParsed);
     }
 
     @Test
     void testCommitObject() {
-        String gitCommitMessage = "tree 29ff16c9c14e2652b22f8b78bb08a5a07930c147\n" +
+        String gitCommitMessage = "213 tree 29ff16c9c14e2652b22f8b78bb08a5a07930c147\n" +
                 "parent 206941306e8a8af65b66eaaaea388a7ae24d49a0\n" +
                 "author Maizi Pulgad <maizipulgad@thb.lt> 1527025023 +0200\n" +
                 "committer Maizi Pulgad <maizipulgad@thb.lt> 1527025044 +0200\n" +

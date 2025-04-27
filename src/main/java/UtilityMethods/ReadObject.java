@@ -25,6 +25,7 @@ public class ReadObject {
         File shaFile = repoFile(repoFile.toPath(), "objects", sha.substring(0, 2), sha.substring(2));
 
         if (!Files.exists(shaFile.toPath())) {
+            System.out.println("File doesn't exist");
             System.out.println(shaFile.getAbsolutePath());
             return null;
         }

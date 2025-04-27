@@ -17,6 +17,7 @@ public class KvlmParse {
      */
     public static Map<String, String> KvlmParse(byte[] rawData) {
         String data = new String(rawData, StandardCharsets.UTF_8);
+        data = data.split(" ", 2)[1];
         Map<String, String> dataMap = new LinkedHashMap<>();
         String[] dataList = data.split("\n");
 

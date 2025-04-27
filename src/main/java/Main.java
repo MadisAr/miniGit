@@ -2,9 +2,6 @@ import Objects.CommandInfoDTO;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("tootab");
-
-
         try {
             // C:\\Users\\madismii\\UT\\oop\\miniGit\\testDir
             ArgParser argParser = new ArgParser();

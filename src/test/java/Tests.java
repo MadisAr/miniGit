@@ -86,7 +86,7 @@ class Tests {
 
         when(mockMGitObject.serialize(mockRepo)).thenReturn(testData);
         when(mockMGitObject.getFormat()).thenReturn("blob");
-        when(mockRepo.getGitDir()).thenReturn(tempDir.toString());
+        when(mockRepo.getGitDir()).thenReturn(tempDir);
 
         String sha = writeObject(mockRepo, mockMGitObject);
         MGitObject mgitObject = ReadObject.readObject(mockRepo, sha);
@@ -142,10 +142,13 @@ class Tests {
     }
 
     @Test
-    void TestRef() {
+    void TestRef() throws IOException {
         Path currentDir = Paths.get(System.getProperty("user.dir"));
         MiniGitRepository mockRepo = Mockito.mock(MiniGitRepository.class);
-        when(mockRepo.getGitDir()).thenReturn(currentDir.resolve(".mgit").toString());
-//        Ref ref = new Ref(mockRepo, mockRepo.getGitDir().re
+        when(mockRepo.getGitDir()).thenReturn(currentDir.resolve(".mgit"));
+        Ref ref = new Ref(mockRepo, mockRepo.getGitDir().resolve("refs/headers/Test"));
+        ref.findSha();
+        System.out.println(ref.getSha());
+        assert ref.getSha().equals("TestSha123");
     }
 }

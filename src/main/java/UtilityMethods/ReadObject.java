@@ -21,7 +21,7 @@ import static UtilityMethods.FindFirstChar.findFirstChar;
 public class ReadObject {
     public static MGitObject readObject(MiniGitRepository miniGitRepository, String sha) throws IOException {
         // teeme sha alamkaustad
-        File repoFile = new File(miniGitRepository.getGitDir());
+        File repoFile = miniGitRepository.getGitDir().toFile();
         File shaFile = repoFile(repoFile.toPath(), "objects", sha.substring(0, 2), sha.substring(2));
 
         if (!Files.exists(shaFile.toPath())) {

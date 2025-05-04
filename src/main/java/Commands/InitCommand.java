@@ -42,7 +42,7 @@ public class InitCommand extends Command {
         MiniGitRepository repo = new MiniGitRepository(path);
 
         File worktreeFile = new File(repo.getWorkTree());
-        File gitDirFile = new File(repo.getGitDir());
+        File gitDirFile = repo.getGitDir().toFile();
 
         // kui loodav kaust eksisteerib juba
         if (worktreeFile.exists()) {

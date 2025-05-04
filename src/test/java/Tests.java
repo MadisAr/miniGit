@@ -3,7 +3,8 @@
 import Objects.MGitObjects.CommitObject;
 import Objects.MGitObjects.MGitObject;
 import Objects.MiniGitRepository;
-import Objects.TreeDTO;
+import Objects.DTO.TreeDTO;
+import Objects.Ref;
 import UtilityMethods.FindFirstChar;
 import UtilityMethods.KvlmParse;
 import UtilityMethods.ParseTree;
@@ -138,5 +139,13 @@ class Tests {
         List<TreeDTO> info = ParseTree.parseTree(bytes);
         assert Arrays.equals(info.getFirst().mode(), "100644".getBytes());
         assert Arrays.equals(info.getFirst().path(), "ArgParser.java".getBytes());
+    }
+
+    @Test
+    void TestRef() {
+        Path currentDir = Paths.get(System.getProperty("user.dir"));
+        MiniGitRepository mockRepo = Mockito.mock(MiniGitRepository.class);
+        when(mockRepo.getGitDir()).thenReturn(currentDir.resolve(".mgit").toString());
+//        Ref ref = new Ref(mockRepo, mockRepo.getGitDir().re
     }
 }

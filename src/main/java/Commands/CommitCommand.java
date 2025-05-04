@@ -1,6 +1,6 @@
 package Commands;
 
-import Objects.ResultDTO;
+import Objects.DTO.ResultDTO;
 
 public class CommitCommand extends Command {
 

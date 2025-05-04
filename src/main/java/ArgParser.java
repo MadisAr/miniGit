@@ -1,4 +1,4 @@
-import Objects.CommandInfoDTO;
+import Objects.DTO.CommandInfoDTO;
 
 import java.util.Arrays;
 

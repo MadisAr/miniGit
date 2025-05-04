@@ -1,7 +1,7 @@
 package Commands;
 
 import Objects.MiniGitRepository;
-import Objects.ResultDTO;
+import Objects.DTO.ResultDTO;
 
 import java.io.File;
 

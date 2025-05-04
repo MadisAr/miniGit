@@ -1,10 +1,9 @@
 package Objects.MGitObjects;
 
 import Objects.MiniGitRepository;
-import Objects.TreeDTO;
+import Objects.DTO.TreeDTO;
 import UtilityMethods.ParseTree;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TreeObject extends MGitObject{

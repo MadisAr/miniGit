@@ -4,14 +4,12 @@ import Objects.MGitObjects.CommitObject;
 import Objects.MGitObjects.MGitObject;
 import Objects.MGitObjects.TreeObject;
 import Objects.MiniGitRepository;
-import Objects.ResultDTO;
-import Objects.TreeDTO;
+import Objects.DTO.ResultDTO;
+import Objects.DTO.TreeDTO;
 import UtilityMethods.CreateGitSubdirectories;
 import UtilityMethods.ReadObject;
-import com.sun.source.tree.Tree;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;

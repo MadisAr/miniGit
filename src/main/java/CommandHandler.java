@@ -1,6 +1,6 @@
 import Commands.Command;
-import Objects.CommandInfoDTO;
-import Objects.ResultDTO;
+import Objects.DTO.CommandInfoDTO;
+import Objects.DTO.ResultDTO;
 
 
 public class CommandHandler {

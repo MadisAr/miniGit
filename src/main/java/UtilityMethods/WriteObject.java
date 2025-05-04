@@ -40,7 +40,7 @@ public class WriteObject {
         String sha = sb.toString();
 
         // teeme antud andmetest uued alamkaustad
-        File repoFile = new File(miniGitRepository.getGitDir());
+        File repoFile = miniGitRepository.getGitDir().toFile();
         File file = createGitDirsAndFile(repoFile,"objects", sha.substring(0, 2), sha.substring(2));
 
         byte[] resultBytes = compress(result.toByteArray());

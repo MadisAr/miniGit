@@ -3,12 +3,16 @@
 import Objects.MGitObjects.CommitObject;
 import Objects.MGitObjects.MGitObject;
 import Objects.MiniGitRepository;
-import Objects.TreeDTO;
+import Objects.DTO.TreeDTO;
+import Objects.Ref;
 import UtilityMethods.FindFirstChar;
 import UtilityMethods.KvlmParse;
 import UtilityMethods.ParseTree;
 import UtilityMethods.ReadObject;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 
@@ -31,18 +35,26 @@ import static UtilityMethods.WriteObject.writeObject;
 import static org.mockito.Mockito.when;
 
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Tests {
 
     @TempDir
     Path tempDir;
 
+    File repoDir;
+    File gitDir;
+
+    @BeforeEach
+    void setup() throws IOException {
+        //teeme ajutis repo
+        repoDir = tempDir.toFile();
+        gitDir = new File(repoDir, ".mgit");
+        gitDir.mkdir();
+    }
+
+
     @Test
     void testReadObject() throws IOException {
-        // teeme ajutise directory testimiseks
-        File repoDir = tempDir.toFile();
-        File gitDir = new File(repoDir, ".mgit");
-        gitDir.mkdir();
-
         MiniGitRepository repo = new MiniGitRepository(repoDir.getAbsolutePath());
 
         String testSha = "abcdef1234567890abcdef1234567890abcdef12";
@@ -85,7 +97,7 @@ class Tests {
 
         when(mockMGitObject.serialize(mockRepo)).thenReturn(testData);
         when(mockMGitObject.getFormat()).thenReturn("blob");
-        when(mockRepo.getGitDir()).thenReturn(tempDir.toString());
+        when(mockRepo.getGitDir()).thenReturn(tempDir);
 
         String sha = writeObject(mockRepo, mockMGitObject);
         MGitObject mgitObject = ReadObject.readObject(mockRepo, sha);
@@ -139,4 +151,25 @@ class Tests {
         assert Arrays.equals(info.getFirst().mode(), "100644".getBytes());
         assert Arrays.equals(info.getFirst().path(), "ArgParser.java".getBytes());
     }
+
+    @Test
+    void TestRef() throws IOException {
+        File refsHeadersDir = new File(gitDir, "refs/headers/");
+        refsHeadersDir.mkdirs();
+
+        File targetRefFile = new File(refsHeadersDir, "Test2");
+        Files.writeString(targetRefFile.toPath(), "TestSha123");
+
+        File refFile = new File(refsHeadersDir, "Test");
+        Files.writeString(refFile.toPath(), "ref: refs/headers/Test2");
+
+        MiniGitRepository mockRepo = Mockito.mock(MiniGitRepository.class);
+        when(mockRepo.getGitDir()).thenReturn(gitDir.toPath());
+
+        Ref ref = new Ref(mockRepo, gitDir.toPath().resolve("refs/headers/Test"));
+        ref.findSha();
+
+        assert ref.getSha().equals("TestSha123");
+    }
+
 }

@@ -1,4 +1,4 @@
-import Objects.CommandInfoDTO;
+import Objects.DTO.CommandInfoDTO;
 
 public class Main {
     public static void main(String[] args) {

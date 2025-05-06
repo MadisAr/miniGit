@@ -1,6 +1,6 @@
 import Commands.Command;
-import Objects.CommandInfoDTO;
-import Objects.ResultDTO;
+import Objects.DTO.CommandInfoDTO;
+import Objects.DTO.ResultDTO;
 
 
 public class CommandHandler {
@@ -19,10 +19,10 @@ public class CommandHandler {
             ResultDTO result = command.execute();
 
             if (result.isSuccess()) {
-                System.out.println("TOOTAB " + result.message() + "\n");
+                System.out.println(result.message() + "\n");
             }
             else {
-                System.out.println("ei toota " + result.message() + "\n");
+                System.out.println("error: " + result.message() + "\n");
             }
         } catch (Exception e) {
             System.out.println(":( " + e.getMessage());

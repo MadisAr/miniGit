@@ -2,7 +2,9 @@ package UtilityMethods;
 
 import Objects.MGitObjects.BlobObject;
 //import Objects.MGitObjects.CommitObject;
+import Objects.MGitObjects.CommitObject;
 import Objects.MGitObjects.MGitObject;
+import Objects.MGitObjects.TreeObject;
 import Objects.MiniGitRepository;
 
 import java.io.ByteArrayInputStream;
@@ -17,12 +19,13 @@ import static UtilityMethods.CreateGitSubdirectories.repoFile;
 import static UtilityMethods.FindFirstChar.findFirstChar;
 
 public class ReadObject {
-    public static MGitObject ReadObject(MiniGitRepository miniGitRepository, String sha) throws IOException {
+    public static MGitObject readObject(MiniGitRepository miniGitRepository, String sha) throws IOException {
         // teeme sha alamkaustad
-        File repoFile = new File(miniGitRepository.getGitDir());
+        File repoFile = miniGitRepository.getGitDir().toFile();
         File shaFile = repoFile(repoFile.toPath(), "objects", sha.substring(0, 2), sha.substring(2));
 
         if (!Files.exists(shaFile.toPath())) {
+            System.out.println("File doesn't exist");
             System.out.println(shaFile.getAbsolutePath());
             return null;
         }
@@ -45,16 +48,20 @@ public class ReadObject {
         if (size != content.length) {
             throw new RuntimeException("Error: sha object " + sha + " header size doesn't match the actual length!");
         }
-        System.out.println("format: " + format);
-        System.out.println("size: " + size);
-        System.out.println("content: " + new String(content, StandardCharsets.US_ASCII));
 
-        String data = size + " " + new String(content, StandardCharsets.US_ASCII);
+//        System.out.println("format: " + format);
+//        System.out.println("size: " + size);
+//        System.out.println("content: " + new String(content, StandardCharsets.US_ASCII));
+//        System.out.println("___________________________________________________________");
+
+        String data = size + " " + new String(content, StandardCharsets.US_ASCII); // tegelt meie viga peaks vb ara votma sizei
         switch (format) {
             case "blob":
-                return new BlobObject(data);
-//            case "commit":
-//                return new CommitObject(data);
+                return new BlobObject(data.getBytes());
+            case "commit":
+                return new CommitObject(data.getBytes());
+            case "tree":
+                return new TreeObject(content);
         }
 
         return null;

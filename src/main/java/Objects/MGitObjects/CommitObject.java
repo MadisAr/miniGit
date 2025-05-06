@@ -25,7 +25,7 @@ public class CommitObject extends MGitObject {
         return format;
     }
 
-    public CommitObject(String data) {
+    public CommitObject(byte[] data) {
         super(data);
     }
 
@@ -36,7 +36,7 @@ public class CommitObject extends MGitObject {
     }
 
     @Override
-    public void deserialize(String data) {
-        content = KvlmParse.KvlmParse(data.getBytes(StandardCharsets.UTF_8));
+    public void deserialize(byte[] data) {
+        content = KvlmParse.KvlmParse(data);
     }
 }

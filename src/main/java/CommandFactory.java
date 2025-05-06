@@ -13,6 +13,7 @@ public class CommandFactory {
             case "commit" -> new CommitCommand(arg);
             case "init" -> new InitCommand(arg);
             case "checkout" -> new CheckoutCommand(arg);
+            case "tag" -> new TagCommand(arg);
             default -> {
                 System.out.println("not working");
                 yield null;

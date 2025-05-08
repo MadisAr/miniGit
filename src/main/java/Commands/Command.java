@@ -3,6 +3,7 @@ package Commands;
 import Objects.DTO.ResultDTO;
 
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 
 public abstract class Command {
     private final String[] args;
@@ -15,5 +16,5 @@ public abstract class Command {
         return args;
     }
 
-    abstract public ResultDTO execute() throws IOException;
+    abstract public ResultDTO execute() throws IOException, NoSuchAlgorithmException;
 }

@@ -4,11 +4,19 @@ import Objects.DTO.ResultDTO;
 import Objects.MGitObjects.MGitObject;
 import Objects.MGitObjects.TagObject;
 import Objects.MiniGitRepository;
+import Objects.Ref;
 import UtilityMethods.CreateGitSubdirectories;
+import UtilityMethods.FindObject;
+import UtilityMethods.ReadObject;
 import UtilityMethods.WriteObject;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
+import java.util.Map;
 
 public class TagCommand extends Command{
 
@@ -17,16 +25,22 @@ public class TagCommand extends Command{
     }
 
     @Override
-    public ResultDTO execute() throws IOException {
+    public ResultDTO execute() throws IOException, NoSuchAlgorithmException {
+        String result = commandTag(getArgs());
 
-        return null;
+        if (result == null) {
+            return new ResultDTO(true, "SAMPLE SUCCESS", null);
+        } else {
+            return new ResultDTO(false, result, null);
+        }
     }
 
     public static String commandTag(String[] args) throws IOException, NoSuchAlgorithmException {
         MiniGitRepository repo = CreateGitSubdirectories.repoFind("");
 
         if (args.length == 0) {
-            listTags(repo);
+            Ref ref = new Ref(null, null);
+            System.out.println(ref.listRefs(repo));
             return null;
         }
 
@@ -52,20 +66,23 @@ public class TagCommand extends Command{
         }
 
         if (name == null) {
-            listTags(repo); // peaks olema ref.listRef class
+            Ref ref = new Ref(null, null);
+            System.out.println(ref.listRefs(repo));
+            return null;
         } else {
-            tagCreate(repo, createTagObject, name, object);
+            return tagCreate(repo, createTagObject, name, object);
         }
-
-        return null;
     }
 
-    private static void tagCreate(MiniGitRepository repo, boolean createTagObject, String name, String object) throws IOException, NoSuchAlgorithmException {
+    private static String tagCreate(MiniGitRepository repo, boolean createTagObject, String name, String object) throws IOException, NoSuchAlgorithmException {
+        String sha = FindObject.findObject(repo, object);
+
+        Path tags = Paths.get("tags", name);
 
         if (createTagObject) {
             TagObject tagObject = new TagObject(null);
 
-            tagObject.set("object", object);
+            tagObject.set("object", sha);
             tagObject.set("type", "commit");
             tagObject.set("tag", name);
             tagObject.set("tagger", "Tag <tag@example.com>");
@@ -73,20 +90,33 @@ public class TagCommand extends Command{
 
             String tagSha = WriteObject.writeObject(repo, tagObject);
             System.out.println(tagSha);
+
             // refCreate function
+            return refCreate(repo, String.valueOf(tags), tagSha);
 
         } else {
             // refCreate lightweight tag
+            return refCreate(repo, String.valueOf(tags), sha);
         }
-
     }
 
-    private static void listTags(MiniGitRepository repo) {
+    private static String refCreate(MiniGitRepository repo, String refName, String sha) throws IOException { // vb panna Ref classi meetodiks pigem. praegu panen siia, kergem hallata
+        Path refPath = repo.getGitDir().resolve("refs").resolve(refName);
+        File refFile = new File(String.valueOf(CreateGitSubdirectories.repoFile(repo.getGitDir(), String.valueOf(refPath))));
 
+        try (FileWriter fileWriter = new FileWriter(refFile)) {
+            fileWriter.write(sha + "\n");
+            return null;
+        } catch (Exception e) {
+            return "Error writing SHA to reference file at: " + refFile;
+        }
     }
 
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
-        String[] args1 = new String[]{"-a", "testName", "testObject"};
+        MiniGitRepository repo = CreateGitSubdirectories.repoFind("");
+//        String[] args1 = new String[]{"-a", "testName1", "testObject"};
+        String[] args1 = new String[]{};
         String result = commandTag(args1);
+
     }
 }

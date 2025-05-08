@@ -172,4 +172,33 @@ class Tests {
         assert ref.getSha().equals("TestSha123");
     }
 
+
+    @Test
+    void testIsFileIgnored(@TempDir Path tempDir) throws IOException {
+        Path gitDir = tempDir.resolve(".mgit");
+        Files.createDirectory(gitDir);
+
+        Path ignoredFile = tempDir.resolve("secret.txt");
+        Path ignoredDir = tempDir.resolve("ignoreme");
+        Path childOfIgnoredDir = ignoredDir.resolve("child.txt");
+
+        Files.createFile(ignoredFile);
+        Files.createDirectories(ignoredDir);
+        Files.createFile(childOfIgnoredDir);
+
+        // kirjutame .mgitignore faili sisu
+        List<String> ignoreLines = List.of("secret.txt", "ignoreme");
+        Files.write(tempDir.resolve(".mgitignore"), ignoreLines);
+
+        MiniGitRepository repo = new MiniGitRepository(tempDir.toString());
+        repo.findIgnored();
+
+        // kontrollime kas failid on ignoreeritud
+        assert repo.isFileIgnored(ignoredFile);
+        assert repo.isFileIgnored(childOfIgnoredDir);
+        assert repo.isFileIgnored(ignoredDir);
+        Path notIgnored = tempDir.resolve("visible.txt");
+        Files.createFile(notIgnored);
+        assert !repo.isFileIgnored(notIgnored);
+    }
 }

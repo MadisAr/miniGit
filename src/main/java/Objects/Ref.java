@@ -1,12 +1,21 @@
 package Objects;
 
+import org.w3c.dom.traversal.TreeWalker;
+
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Refid on gitis viited git objektidele
  */
+
+// hetkel iga ref saab teoorias listida kogu .mgit refs kausta
+// tegelt voiks kuidagi muudmoodi teha seda, TODO
+
 public class Ref {
     private MiniGitRepository miniGitRepository;
     private String sha;
@@ -32,7 +41,7 @@ public class Ref {
      */
     public void findSha() throws IOException {
         Path activePath = path.resolve("");
-        String data = String.valueOf(new String(Files.readAllBytes(activePath)));
+        String data = new String(Files.readAllBytes(activePath));
 
         while (data.startsWith("ref: ")) {
             String newPath = data.split(" ", 2)[1];
@@ -41,5 +50,32 @@ public class Ref {
         }
 
         sha = data;
+    }
+
+    public Map<String, Object> listRefsRecursive(MiniGitRepository repo, File dir) {
+        Map<String, Object> refs = new TreeMap<>();
+
+        File[] children = dir.listFiles();
+        if (children == null) return refs;
+
+        for (File file : children) {
+            if (file.isDirectory()) {
+                refs.put(file.getName(), listRefsRecursive(repo, file));
+            } else {
+                try {
+                    Ref ref = new Ref(repo, file.toPath());
+                    ref.findSha();
+                    refs.put(file.getName(), ref.getSha().trim());
+                } catch (IOException e) {
+                    System.out.println("Failed to resolve ref at " + file + ": " + e.getMessage());
+                }
+            }
+        }
+        return refs;
+    }
+
+    public Map<String, Object> listRefs(MiniGitRepository repo) {
+        File refsDir = repo.getGitDir().resolve("refs").toFile();
+        return listRefsRecursive(repo, refsDir);
     }
 }

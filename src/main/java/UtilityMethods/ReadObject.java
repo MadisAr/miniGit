@@ -1,12 +1,10 @@
 package UtilityMethods;
 
-import Objects.MGitObjects.BlobObject;
+import Objects.MGitObjects.*;
 //import Objects.MGitObjects.CommitObject;
-import Objects.MGitObjects.CommitObject;
-import Objects.MGitObjects.MGitObject;
-import Objects.MGitObjects.TreeObject;
 import Objects.MiniGitRepository;
 
+import javax.swing.text.html.HTML;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -62,6 +60,8 @@ public class ReadObject {
                 return new CommitObject(data.getBytes());
             case "tree":
                 return new TreeObject(content);
+            case "tag":
+                return new TagObject(data.getBytes());
         }
 
         return null;

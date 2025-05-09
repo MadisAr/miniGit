@@ -44,7 +44,7 @@ public class Ref {
         String data = new String(Files.readAllBytes(activePath));
 
         while (data.startsWith("ref: ")) {
-            String newPath = data.split(" ", 2)[1];
+            String newPath = data.split(" ", 2)[1].trim();
             activePath = miniGitRepository.getGitDir().resolve(newPath);
             data = new String(Files.readAllBytes(activePath));
         }

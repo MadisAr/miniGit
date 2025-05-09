@@ -40,11 +40,12 @@ public class MiniGitRepository {
     }
 
 
-    /** TODO praegu pole error handlimine eriti hea (iga kord manuaalselt kirjutada error message) vblla pigem teha ise exception?
+    /**
+     * TODO praegu pole error handlimine eriti hea (iga kord manuaalselt kirjutada error message) vblla pigem teha ise exception?
      * votab string ja valikulise parameetri fmt
      *
      * @param name otsitav nimi
-     * @param fmt kui soovitakse mingit kindlat tyypi objekti
+     * @param fmt  kui soovitakse mingit kindlat tyypi objekti
      * @return tagastab leitud String sha
      * @throws IOException readObject error
      */
@@ -58,26 +59,10 @@ public class MiniGitRepository {
 
         if (fmt == null) return sha;
 
-        while (true) {
-            MGitObject obj = ReadObject.readObject(this, sha);
+        MGitObject obj = ReadObject.readObject(this, sha);
+        if (obj == null) throw new RuntimeException("Error parsing object");
 
-            if (obj == null) throw new RuntimeException("Error parsing object");
-
-            if (obj.getFormat().equals(fmt)) {
-                return sha;
-            }
-
-
-            if (obj.getFormat().equals("tag")) {
-                Map<String, String> kvlm = (Map<String, String>) obj.getContent();
-                sha = kvlm.get("object");
-            } else if (obj.getFormat().equals("commit") && fmt.equals("tree")) {
-                Map<String, String> kvlm = (Map<String, String>) obj.getContent();
-                sha = kvlm.get("object");
-            } else {
-                throw new RuntimeException("Error parsing object");
-            }
-        }
+        return obj.getFormat().equals(fmt) ? sha : null;
     }
 
     /**
@@ -89,7 +74,7 @@ public class MiniGitRepository {
      * @return tagastav listi kandidaatidest mis peaks olema 1 elemendi pikkune
      */
     private List<String> findCandidates(String name) throws IOException {
-        if (name.equals("")) {
+        if (name.isEmpty()) {
             return null;
         }
 
@@ -180,19 +165,5 @@ public class MiniGitRepository {
         // kui parenteid rohkem pole oleme joudnud failitee algusesse jarelikult polnud fail meie repo kaustas
         // hetkel tagastan false aga vblla peaks errori viskama?
         return false;
-    }
-
-    public static void main(String[] args) throws IOException {
-        String currentDir = System.getProperty("user.dir");
-        Path currentDirPath = Paths.get(currentDir);
-        MiniGitRepository miniGitRepository = new MiniGitRepository(currentDir);
-
-        miniGitRepository.findIgnored();
-        System.out.println(miniGitRepository.isFileIgnored(currentDirPath.resolve("pompdede.xml")));
-        System.out.println(miniGitRepository.isFileIgnored(currentDirPath.resolve("README.md")));
-        System.out.println(miniGitRepository.isFileIgnored(currentDirPath.resolve("testDir").resolve("READMEk.md")));
-        System.out.println(miniGitRepository.isFileIgnored(currentDirPath.resolve("pom.xml")));
-        System.out.println(miniGitRepository.isFileIgnored(currentDirPath.resolve("testDir")));
-        System.out.println(miniGitRepository.isFileIgnored(currentDirPath.resolve("testDir").resolve("README.md")));
     }
 }

@@ -118,7 +118,7 @@ class Tests {
         String unParsed = new String(KvlmParse.KvlmUnParse(vals), StandardCharsets.UTF_8);
 
         assert vals.get("message").equals("Test commit sonum");
-        assert (gitCommitMessage).equals("213 " +unParsed);
+        assert (gitCommitMessage).equals("213 " + unParsed);
     }
 
     @Test
@@ -200,5 +200,48 @@ class Tests {
         Path notIgnored = tempDir.resolve("visible.txt");
         Files.createFile(notIgnored);
         assert !repo.isFileIgnored(notIgnored);
+    }
+
+    @Test
+    void testFindObjectWithHeadAndBranch() throws IOException {
+        MiniGitRepository repo = new MiniGitRepository(repoDir.getAbsolutePath());
+
+        String sha = "a1b2c3d4e5f678901234567890abcdefabcdef12";
+        String format = "commit";
+        String content = "tree 0123456789abcdef0123456789abcdef01234567\nparent test\nauthor test\ncommiter test\n\nTest commit";
+
+        File objectsDir = new File(gitDir, "objects");
+        objectsDir.mkdirs();
+        File shaDir = new File(objectsDir, sha.substring(0, 2));
+        shaDir.mkdir();
+        File shaFile = new File(shaDir, sha.substring(2));
+
+        ByteArrayOutputStream rawContent = new ByteArrayOutputStream();
+        rawContent.write(format.getBytes(StandardCharsets.US_ASCII));
+        rawContent.write(' ');
+        rawContent.write(Integer.toString(content.length()).getBytes(StandardCharsets.US_ASCII));
+        rawContent.write(0);
+        rawContent.write(content.getBytes(StandardCharsets.US_ASCII));
+
+        try (FileOutputStream fos = new FileOutputStream(shaFile);
+             DeflaterOutputStream dos = new DeflaterOutputStream(fos)) {
+            dos.write(rawContent.toByteArray());
+        }
+
+        Path refsHeads = gitDir.toPath().resolve("refs").resolve("heads");
+        Files.createDirectories(refsHeads);
+        Path testBranchRef = refsHeads.resolve("testbranch");
+        Files.writeString(testBranchRef, sha);
+
+        Path head = gitDir.toPath().resolve("HEAD");
+        Files.writeString(head, "ref: refs/heads/testbranch");
+
+        String foundFromHead = repo.findObject("HEAD", null);
+        String foundFromBranch = repo.findObject("testbranch", "commit");
+        String notFoundFromBranch = repo.findObject("testbranch", "blob");
+
+        assert foundFromHead.equals(sha);
+        assert foundFromBranch.equals(sha);
+        assert notFoundFromBranch == null;
     }
 }

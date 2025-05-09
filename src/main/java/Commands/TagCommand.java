@@ -6,8 +6,6 @@ import Objects.MGitObjects.TagObject;
 import Objects.MiniGitRepository;
 import Objects.Ref;
 import UtilityMethods.CreateGitSubdirectories;
-import UtilityMethods.FindObject;
-import UtilityMethods.ReadObject;
 import UtilityMethods.WriteObject;
 
 import java.io.File;
@@ -75,7 +73,8 @@ public class TagCommand extends Command{
     }
 
     private static String tagCreate(MiniGitRepository repo, boolean createTagObject, String name, String object) throws IOException, NoSuchAlgorithmException {
-        String sha = FindObject.findObject(repo, object);
+        String sha = repo.findObject(object, null);
+
 
         Path tags = Paths.get("tags", name);
 

@@ -1,9 +1,9 @@
 package Objects;
 
+import UtilityMethods.CreateGitSubdirectories;
 import org.mockito.Mockito;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HexFormat;
 import java.util.List;
 
 import static org.mockito.Mockito.when;
@@ -23,6 +24,14 @@ public class MGitIndex {
     public MGitIndex(int version, List<MGitIndexEntry> entries) {
         this.entries = entries;
         this.version = version;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public List<MGitIndexEntry> getEntries() {
+        return entries;
     }
 
     // funktsioon .git index failide lugemiseks, paris giti omade peal tootab
@@ -81,6 +90,54 @@ public class MGitIndex {
         }
 
         return new MGitIndex(version, entries);
+    }
+
+    public void write(MiniGitRepository repo) {
+        Path indexPath = repo.getGitDir().resolve("index");
+
+        try (
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                DataOutputStream dos = new DataOutputStream(baos);
+        ) {
+            dos.write("DIRC".getBytes(StandardCharsets.US_ASCII));
+            dos.writeInt(getVersion());
+            dos.writeInt(getEntries().size());
+
+            for (MGitIndexEntry entry : entries) {
+                dos.writeInt(entry.cTimeSeconds);
+                dos.writeInt(entry.cTimeNanoseconds);
+                dos.writeInt(entry.mTimeSeconds);
+                dos.writeInt(entry.mTimeNanoseconds);
+                dos.writeInt(entry.dev);
+                dos.writeInt(entry.ino);
+
+                int mode = (entry.modeType << 12) | entry.modePerms;
+                dos.writeInt(mode);
+
+                dos.writeInt(entry.uid);
+                dos.writeInt(entry.gid);
+                dos.writeInt(entry.fileSize);
+                dos.write(entry.sha);
+
+                int nameLength = Math.min(entry.name.getBytes(StandardCharsets.UTF_8).length, 0xFFF);
+
+                dos.writeShort(entry.flags); // ma pole kindel mida siin tegema peaks lol, arutab hiljem
+
+                byte[] nameBytes = entry.name.getBytes(StandardCharsets.UTF_8);
+                dos.write(nameBytes);
+                dos.writeByte(0);
+
+                int entryLen = 62 + nameBytes.length + 1;
+                int padding = (8 - (entryLen % 8)) % 8;
+                dos.write(new byte[padding]);
+            }
+
+            try (OutputStream out = Files.newOutputStream(indexPath)) {
+                baos.writeTo(out);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e); // ajutine
+        }
     }
 
 // ajutine testimiseks, parast teen testi sellele

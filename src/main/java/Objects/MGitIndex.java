@@ -18,10 +18,12 @@ import java.util.List;
 import static org.mockito.Mockito.when;
 
 public class MGitIndex {
-    List<MGitIndexEntry> entries;
-    int version;
+    private MiniGitRepository repo;
+    private List<MGitIndexEntry> entries;
+    private int version;
 
-    public MGitIndex(int version, List<MGitIndexEntry> entries) {
+    public MGitIndex(int version, List<MGitIndexEntry> entries, MiniGitRepository miniGitRepository) {
+        this.repo = miniGitRepository;
         this.entries = entries;
         this.version = version;
     }
@@ -34,9 +36,10 @@ public class MGitIndex {
         entries.add(mGitIndexEntry);
     }
 
-    // TODO kas peaks tegema u relativePath.replace('\', '/') et oleks koikidel nimedel samad separatorid?
     public void removeEntry(String relativePath) {
-        entries.removeIf(entry -> entry.name.equals(relativePath));
+        // asendame backslashid tavalistega sest git kasutab enda siseselt tavalisi slashe
+        String normalized = relativePath.replace('\\', '/');
+        entries.removeIf(entry -> entry.name.equals(normalized));
     }
 
     public List<MGitIndexEntry> getEntries() {
@@ -44,11 +47,11 @@ public class MGitIndex {
     }
 
     // funktsioon .git index failide lugemiseks, paris giti omade peal tootab
-    public static MGitIndex read(MiniGitRepository repo) throws IOException {
+    public void read() throws IOException {
         File indexFile = repo.getGitDir().resolve("index").toFile();
 
         if (!indexFile.exists()) {
-            return new MGitIndex(2, new ArrayList<>());
+            entries = new ArrayList<>();
         }
 
         byte[] byteData = Files.readAllBytes(indexFile.toPath());
@@ -56,9 +59,9 @@ public class MGitIndex {
         ByteBuffer buf = ByteBuffer.wrap(byteData).order(ByteOrder.BIG_ENDIAN);
 
         int signature = buf.getInt();
-        int version = buf.getInt();
+        version = buf.getInt();
         int entryCount = buf.getInt();
-        List<MGitIndexEntry> entries = new ArrayList<>();
+        List<MGitIndexEntry> readEntries = new ArrayList<>();
 
         for (int i = 0; i < entryCount; i++) {
             // alguspositsioon hiljemaks bufferi pikkuse arvutamiseks
@@ -95,13 +98,13 @@ public class MGitIndex {
             }
 
             MGitIndexEntry mGitIndexEntry = new MGitIndexEntry(cTime, cTimeNs, mTime, mTimeNs, dev, ino, mode >> 12, mode & 0xFFF, uid, gid, fileSize, sha, flags, name);
-            entries.add(mGitIndexEntry);
+            readEntries.add(mGitIndexEntry);
         }
 
-        return new MGitIndex(version, entries);
+        entries = readEntries;
     }
 
-    public void write(MiniGitRepository repo) {
+    public void write() {
         Path indexPath = repo.getGitDir().resolve("index");
 
         try (

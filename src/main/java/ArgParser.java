@@ -3,7 +3,7 @@ import Objects.DTO.CommandInfoDTO;
 import java.util.Arrays;
 
 public class ArgParser {
-    private static final String[] commands = {"init", "add", "commit", "checkout"};
+    private static final String[] commands = {"init", "add", "commit", "checkout", "rm"};
 
     /**
      * võtab argumendid ja eraldab funktsiooninimeks

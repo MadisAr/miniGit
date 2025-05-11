@@ -30,6 +30,15 @@ public class MGitIndex {
         return version;
     }
 
+    public void addEntry(MGitIndexEntry mGitIndexEntry) {
+        entries.add(mGitIndexEntry);
+    }
+
+    // TODO kas peaks tegema u relativePath.replace('\', '/') et oleks koikidel nimedel samad separatorid?
+    public void removeEntry(String relativePath) {
+        entries.removeIf(entry -> entry.name.equals(relativePath));
+    }
+
     public List<MGitIndexEntry> getEntries() {
         return entries;
     }

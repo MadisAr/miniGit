@@ -19,7 +19,7 @@ public class RmCommand extends Command {
         MiniGitRepository miniGitRepository = new MiniGitRepository(System.getProperty("user.dir"));
 
         String pathString = getArgs()[0];
-        Path filePath = miniGitRepository.getGitDir().resolve(pathString);
+        Path filePath = miniGitRepository.getRepoDir().resolve(pathString);
 
         // versioon peaks meil alati 2 olema
         MGitIndex mGitIndex = new MGitIndex(2, new ArrayList<>(), miniGitRepository);
@@ -28,7 +28,7 @@ public class RmCommand extends Command {
         } catch (Exception e) {
             return new ResultDTO(false, e.getMessage(), null);
         }
-
+        System.out.println(mGitIndex.getEntries());
 
         // kui antud path on fail siis removime ainult selle
         if (!Files.isDirectory(filePath)) {
@@ -47,6 +47,7 @@ public class RmCommand extends Command {
         }
 
         mGitIndex.write();
+        System.out.println(mGitIndex.getEntries());
         return new ResultDTO(true, "File(s) removed", null);
     }
 }

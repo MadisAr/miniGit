@@ -17,6 +17,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class AddCommand extends Command {
     public AddCommand(String[] args) {
@@ -44,20 +45,46 @@ public class AddCommand extends Command {
         System.out.println(mGitIndex.getEntries());
         if (!Files.isDirectory(filePath)) {
             try {
-                MGitIndexEntry entry = createIndexEntry(filePath, miniGitRepository.getRepoDir());
-                mGitIndex.addEntry(entry);
+                updateFile(filePath, mGitIndex, miniGitRepository);
             } catch (IOException e) {
                 return new ResultDTO(false, e.getMessage(), null);
             }
         } else {
-            // polnud praegu aega lopuni teha
-            // konnib kausta labi ja teeb mida vaja
+            try (Stream<Path> stream = Files.walk(filePath)) {
+                stream.filter(Files::isRegularFile).forEach(path -> {
+                    try {
+                        updateFile(path, mGitIndex, miniGitRepository);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                });
+            } catch (Exception e) {
+                return new ResultDTO(false, e.getMessage(), null);
+            }
         }
 
 
         mGitIndex.write();
         System.out.println(mGitIndex.getEntries());
-        return new ResultDTO(true, "added file(s)", null);
+        return new
+
+                ResultDTO(true, "added file(s)", null);
+    }
+
+
+    /**
+     * eemaldab antud mGitIndexEntry mGitIndeksist, lisab uuesti listi ja kirjutab
+     *
+     * @param filePath  antud faili path
+     * @param mGitIndex muudetav mGitIndex
+     */
+    private void updateFile(Path filePath, MGitIndex mGitIndex, MiniGitRepository mGitRepo) throws IOException {
+        // kui pole ignoreeritud failide hulgas siis eemaldame vana entry ja lisame uue
+        if (!mGitRepo.isFileIgnored(filePath)) {
+            MGitIndexEntry entry = createIndexEntry(filePath, mGitRepo.getRepoDir());
+            mGitIndex.removeEntry(entry.name());
+            mGitIndex.addEntry(entry);
+        }
     }
 
     /**
@@ -82,13 +109,20 @@ public class AddCommand extends Command {
         int mTimeSeconds = (int) cTime.toInstant().getEpochSecond();
         int mTimeNano = (int) cTime.toInstant().getNano();
 
+        // seame default vaartused, ma ei ole kindel kuidas dev ja ino leida
         int dev = 0, ino = 0, uid = 0, gid = 0, modeType = 0, modePerms = 0;
 
-        // TODO Siin on viga sest apparently windowsis ei toota PosixFileAttributes nii et peab midagi muud kasutama
-        PosixFileAttributes posixA = Files.readAttributes(path, PosixFileAttributes.class);
-        uid = posixA.owner().getName().hashCode();
-        gid = posixA.group().getName().hashCode();
-        modePerms = calculatePermissions(posixA.permissions());
+        try {
+            PosixFileAttributes posixAttributes = Files.readAttributes(path, PosixFileAttributes.class);
+            uid = posixAttributes.owner().getName().hashCode();
+            gid = posixAttributes.group().getName().hashCode();
+            modePerms = calculateUnixPermissions(posixAttributes.permissions());
+        } catch (Exception e) {
+            // windowsi korral
+            uid = Files.getOwner(path).getName().hashCode();
+            gid = -1;
+            modePerms = calculateWinPermissions(path);
+        }
 
         // giti tahised failityypidele hex koodis
         if (Files.isRegularFile(path)) {
@@ -114,17 +148,34 @@ public class AddCommand extends Command {
         short flags = 0;
 
         // teeme relative pathi globalist
-        String name = workDirPath.relativize(path).toString();
+        String name = workDirPath.relativize(path).toString().replace("\\", "/");
         return new MGitIndexEntry(cTimeSeconds, cTimeNano, mTimeSeconds, mTimeNano, dev, ino, modeType, modePerms, uid, gid, fileSize, shaBytes, flags, name);
     }
 
     /**
+     * arvutab windowsi jaoks permissionid
+     *
+     * @param path antud faili path
+     * @return tagastab int vaartuse permissionitest
+     */
+    private int calculateWinPermissions(Path path) {
+        int mode = 0;
+
+        if (Files.isWritable(path)) mode |= 0x100;
+        if (Files.isReadable(path)) mode |= 0x80;
+        if (Files.isExecutable(path)) mode |= 0x40;
+
+        return mode;
+    }
+
+    /**
      * vaatab permissioneid ja lisab vastavad bitid mode intile
+     * seda saab teha ainult unixi operatsioonisysteemide puhul
      *
      * @param perms set permissionitest
      * @return tagastab saadud int vaartuse permissionitest
      */
-    private int calculatePermissions(Set<PosixFilePermission> perms) {
+    private int calculateUnixPermissions(Set<PosixFilePermission> perms) {
         int mode = 0;
 
         if (perms.contains(PosixFilePermission.OWNER_READ)) mode |= 0x100;
@@ -142,15 +193,5 @@ public class AddCommand extends Command {
         return mode;
     }
 
-    /**
-     * eemaldab antud mGitIndexEntry mGitIndeksist, lisab uuesti listi ja kirjutab
-     *
-     * @param mGitIndexEntry kirjutatav entry
-     * @param mGitIndex      muudetav mGitIndex
-     */
-    private void updateFile(MGitIndexEntry mGitIndexEntry, MGitIndex mGitIndex) {
-        mGitIndex.removeEntry(mGitIndexEntry.name());
-        mGitIndex.addEntry(mGitIndexEntry);
-        mGitIndex.write();
-    }
+
 }

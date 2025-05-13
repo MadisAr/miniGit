@@ -110,12 +110,4 @@ public class TagCommand extends Command{
             return "Error writing SHA to reference file at: " + refFile;
         }
     }
-
-    public static void main(String[] args) throws IOException, NoSuchAlgorithmException {
-        MiniGitRepository repo = CreateGitSubdirectories.repoFind("");
-//        String[] args1 = new String[]{"-a", "testName1", "testObject"};
-        String[] args1 = new String[]{};
-        String result = commandTag(args1);
-
-    }
 }

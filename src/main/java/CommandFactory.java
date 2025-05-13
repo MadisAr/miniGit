@@ -15,6 +15,7 @@ public class CommandFactory {
             case "checkout" -> new CheckoutCommand(arg);
             case "tag" -> new TagCommand(arg);
             case "rm" -> new RmCommand(arg);
+            case "add" -> new AddCommand(arg);
             default -> {
                 System.out.println("not working");
                 yield null;

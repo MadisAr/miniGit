@@ -1,21 +1,13 @@
 package Objects;
 
-import UtilityMethods.CreateGitSubdirectories;
-import org.mockito.Mockito;
-
 import java.io.*;
-import java.lang.reflect.Field;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.HexFormat;
 import java.util.List;
-
-import static org.mockito.Mockito.when;
 
 public class MGitIndex {
     private MiniGitRepository repo;
@@ -39,7 +31,7 @@ public class MGitIndex {
     public void removeEntry(String relativePath) {
         // asendame backslashid tavalistega sest git kasutab enda siseselt tavalisi slashe
         String normalized = relativePath.replace('\\', '/');
-        entries.removeIf(entry -> entry.name.equals(normalized));
+        entries.removeIf(entry -> entry.name().equals(normalized));
     }
 
     public List<MGitIndexEntry> getEntries() {
@@ -116,26 +108,26 @@ public class MGitIndex {
             dos.writeInt(getEntries().size());
 
             for (MGitIndexEntry entry : entries) {
-                dos.writeInt(entry.cTimeSeconds);
-                dos.writeInt(entry.cTimeNanoseconds);
-                dos.writeInt(entry.mTimeSeconds);
-                dos.writeInt(entry.mTimeNanoseconds);
-                dos.writeInt(entry.dev);
-                dos.writeInt(entry.ino);
+                dos.writeInt(entry.cTimeSeconds());
+                dos.writeInt(entry.cTimeNanoseconds());
+                dos.writeInt(entry.mTimeSeconds());
+                dos.writeInt(entry.mTimeNanoseconds());
+                dos.writeInt(entry.dev());
+                dos.writeInt(entry.ino());
 
-                int mode = (entry.modeType << 12) | entry.modePerms;
+                int mode = (entry.modeType() << 12) | entry.modePerms();
                 dos.writeInt(mode);
 
-                dos.writeInt(entry.uid);
-                dos.writeInt(entry.gid);
-                dos.writeInt(entry.fileSize);
-                dos.write(entry.sha);
+                dos.writeInt(entry.uid());
+                dos.writeInt(entry.gid());
+                dos.writeInt(entry.fileSize());
+                dos.write(entry.sha());
 
-                int nameLength = Math.min(entry.name.getBytes(StandardCharsets.UTF_8).length, 0xFFF);
+                int nameLength = Math.min(entry.name().getBytes(StandardCharsets.UTF_8).length, 0xFFF);
 
-                dos.writeShort(entry.flags); // ma pole kindel mida siin tegema peaks lol, arutab hiljem
+                dos.writeShort(entry.flags()); // ma pole kindel mida siin tegema peaks lol, arutab hiljem
 
-                byte[] nameBytes = entry.name.getBytes(StandardCharsets.UTF_8);
+                byte[] nameBytes = entry.name().getBytes(StandardCharsets.UTF_8);
                 dos.write(nameBytes);
                 dos.writeByte(0);
 
@@ -151,13 +143,4 @@ public class MGitIndex {
             throw new RuntimeException(e); // ajutine
         }
     }
-
-// ajutine testimiseks, parast teen testi sellele
-//    public static void main(String[] args) throws IOException {
-//        MiniGitRepository miniGitRepository = Mockito.mock(MiniGitRepository.class);
-//        when(miniGitRepository.getGitDir()).thenReturn(Paths.get(""));
-//        byte[] b = Files.readAllBytes(miniGitRepository.getGitDir().resolve("index"));
-//        MGitIndex mGitIndex = read(miniGitRepository);
-//        System.out.println("tada");
-//    }
 }

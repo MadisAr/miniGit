@@ -1,7 +1,6 @@
 package Commands;
 
 import Objects.DTO.ResultDTO;
-import Objects.MGitObjects.MGitObject;
 import Objects.MGitObjects.TagObject;
 import Objects.MiniGitRepository;
 import Objects.Ref;
@@ -14,7 +13,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
-import java.util.Map;
 
 public class TagCommand extends Command{
 
@@ -23,7 +21,7 @@ public class TagCommand extends Command{
     }
 
     @Override
-    public ResultDTO execute() throws IOException, NoSuchAlgorithmException {
+    public ResultDTO execute() {
         String result = commandTag(getArgs());
 
         if (result == null) {
@@ -33,7 +31,7 @@ public class TagCommand extends Command{
         }
     }
 
-    public static String commandTag(String[] args) throws IOException, NoSuchAlgorithmException {
+    public static String commandTag(String[] args){
         MiniGitRepository repo = CreateGitSubdirectories.repoFind("");
 
         if (args.length == 0) {
@@ -68,7 +66,11 @@ public class TagCommand extends Command{
             System.out.println(ref.listRefs(repo));
             return null;
         } else {
-            return tagCreate(repo, createTagObject, name, object);
+            try {
+                return tagCreate(repo, createTagObject, name, object);
+            } catch (Exception e ) {
+                return e.getMessage();
+            }
         }
     }
 

@@ -1,10 +1,8 @@
 package UtilityMethods;
 
 import Objects.MGitObjects.*;
-//import Objects.MGitObjects.CommitObject;
 import Objects.MiniGitRepository;
 
-import javax.swing.text.html.HTML;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -17,7 +15,7 @@ import static UtilityMethods.CreateGitSubdirectories.repoFile;
 import static UtilityMethods.FindFirstChar.findFirstChar;
 
 public class ReadObject {
-    public static MGitObject readObject(MiniGitRepository miniGitRepository, String sha) throws IOException {
+    public static MGitObject readObject(MiniGitRepository miniGitRepository, String sha) {
         // teeme sha alamkaustad
         File repoFile = miniGitRepository.getGitDir().toFile();
         File shaFile = repoFile(repoFile.toPath(), "objects", sha.substring(0, 2), sha.substring(2));
@@ -27,8 +25,14 @@ public class ReadObject {
             System.out.println(shaFile.getAbsolutePath());
             return null;
         }
+        byte[] decompressedBytes;
 
-        byte[] decompressedBytes = decompress(Files.readAllBytes(shaFile.toPath()));
+        try {
+            decompressedBytes = decompress(Files.readAllBytes(shaFile.toPath()));
+        } catch (IOException e) {
+            return null;
+        }
+
 
         // loe baidireast objekti tyyp/format
         int spaceIndex = findFirstChar(decompressedBytes, (byte) ' ', 0);

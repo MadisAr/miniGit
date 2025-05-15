@@ -1,17 +1,19 @@
-import Objects.DTO.CommandInfoDTO;
+import Commands.Command;
+import Objects.DTO.ResultDTO;
+
+import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) {
-        try {
-            // C:\\Users\\madismii\\UT\\oop\\miniGit\\testDir
-            ArgParser argParser = new ArgParser();
-            CommandHandler commandHandler = new CommandHandler();
+        String commandName = args[0];
+        args = Arrays.copyOfRange(args, 1, args.length);
+        Command command = CommandFactory.createCommand(commandName, args);
+        ResultDTO result = command != null ? command.execute() : new ResultDTO(false, "Command not found", null);
 
-            CommandInfoDTO commandInfoDTO = argParser.parse(args);
-
-            commandHandler.executeCommand(commandInfoDTO);
-        } catch (Exception e) {
-            System.out.println("womp womp " + e.getMessage());
+        if (result.isSuccess()) {
+            System.out.println(result.message() + "\n");
+        } else {
+            System.out.println("error: " + result.message() + "\n");
         }
     }
 }

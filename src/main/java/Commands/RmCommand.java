@@ -18,7 +18,7 @@ public class RmCommand extends Command {
     public ResultDTO execute() {
         MiniGitRepository miniGitRepository = new MiniGitRepository(System.getProperty("user.dir"));
 
-        String pathString = getArgs()[0];
+        String pathString = getArgs()[0].equals(".") ? "" : getArgs()[0];
         Path filePath = miniGitRepository.getRepoDir().resolve(pathString);
 
         // versioon peaks meil alati 2 olema
@@ -26,7 +26,9 @@ public class RmCommand extends Command {
         try {
             mGitIndex.read();
         } catch (Exception e) {
-            return new ResultDTO(false, e.getMessage(), null);
+            // kui fail on tyhi
+            mGitIndex.write();
+            return new ResultDTO(true, "Nothing added", null);
         }
         System.out.println(mGitIndex.getEntries());
 

@@ -4,6 +4,8 @@ import Objects.MiniGitRepository;
 import Objects.DTO.ResultDTO;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 
 import static UtilityMethods.CreateGitSubdirectories.createGitSubdirectories;
 
@@ -63,6 +65,10 @@ public class InitCommand extends Command {
         createGitSubdirectories(gitDirFile, "objects");
         createGitSubdirectories(gitDirFile, "refs", "tags");
         createGitSubdirectories(gitDirFile, "refs", "headers");
+        try {
+            Files.writeString(repo.getRepoDir().resolve(".mgitignore"), ".mgit");
+        } catch (IOException ignored) {
+        }
 
         return repo;
     }

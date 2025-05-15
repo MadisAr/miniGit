@@ -24,7 +24,7 @@ public class CheckoutCommand extends Command {
     }
 
     @Override
-    public ResultDTO execute() throws IOException {
+    public ResultDTO execute() {
         String result = commandCheckout(getArgs());
         if (result == null) {
             return new ResultDTO(true, "Checkout succesful, commit instantiated at " + getArgs()[1], null);
@@ -34,7 +34,7 @@ public class CheckoutCommand extends Command {
         }
     }
 
-    public static String commandCheckout(String[] args) throws IOException {
+    public static String commandCheckout(String[] args)  {
         MiniGitRepository repo = CreateGitSubdirectories.repoFind("");
         if (repo == null) return "Couldn't find .mgit directory.";
 
@@ -58,7 +58,11 @@ public class CheckoutCommand extends Command {
             return "Given directory " + args[1] + " doesn't exist.";
         }
 
-        return treeCheckout(repo, treeObject, args[1]);
+        try {
+            return treeCheckout(repo, treeObject, args[1]);
+        } catch (IOException e) {
+            return e.getMessage();
+        }
     }
 
     public static String treeCheckout(MiniGitRepository repo, TreeObject tree, String path) throws IOException {

@@ -8,7 +8,6 @@ public class CommandFactory {
      * @return vastava Command isendi
      */
     public static Command createCommand(String commandName, String[] arg) {
-
         return switch (commandName) {
             case "commit" -> new CommitCommand(arg);
             case "init" -> new InitCommand(arg);

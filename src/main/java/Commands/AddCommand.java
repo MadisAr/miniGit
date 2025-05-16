@@ -20,15 +20,15 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 public class AddCommand extends Command {
-    public AddCommand(String[] args) {
-        super(args);
+    public AddCommand(String[] args, MiniGitRepository miniGitRepository) {
+        super(args, miniGitRepository);
     }
 
     // TODO siin tegelikult peaks arvestama ka ignoreeritud failidega
     @Override
     public ResultDTO execute() {
         // sama kood mis RmCommandis ma ei tea kas peaks tegema funktsiooni? aga kuhu??
-        MiniGitRepository miniGitRepository = new MiniGitRepository(System.getProperty("user.dir"));
+        MiniGitRepository miniGitRepository = super.getMinigitRepository();
         try {
             miniGitRepository.findIgnored();
         } catch (IOException e) {
@@ -48,7 +48,6 @@ public class AddCommand extends Command {
         }
 
 
-        System.out.println(mGitIndex.getEntries());
         if (!Files.isDirectory(filePath)) {
             try {
                 updateFile(filePath, mGitIndex, miniGitRepository);
@@ -71,7 +70,6 @@ public class AddCommand extends Command {
 
 
         mGitIndex.write();
-        System.out.println(mGitIndex.getEntries());
         return new ResultDTO(true, "added file(s)", null);
     }
 

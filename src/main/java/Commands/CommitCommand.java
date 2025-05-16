@@ -1,6 +1,7 @@
 package Commands;
 
 import Objects.DTO.ResultDTO;
+import Objects.MiniGitRepository;
 
 public class CommitCommand extends Command {
 
@@ -17,7 +18,7 @@ public class CommitCommand extends Command {
         return new ResultDTO(true, "Commit successful", "hash??");
     }
 
-    public CommitCommand(String[] args) {
-        super(args);
+    public CommitCommand(String[] args, MiniGitRepository miniGitRepository) {
+        super(args, miniGitRepository);
     }
 }

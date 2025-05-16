@@ -6,6 +6,7 @@ import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -136,7 +137,9 @@ public class MGitIndex {
                 dos.write(new byte[padding]);
             }
 
-            try (OutputStream out = Files.newOutputStream(indexPath)) {
+            try (OutputStream out = Files.newOutputStream(indexPath,
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.TRUNCATE_EXISTING)) {
                 baos.writeTo(out);
             }
         } catch (IOException e) {

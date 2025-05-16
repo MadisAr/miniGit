@@ -1,4 +1,7 @@
 import Commands.*;
+import Objects.MiniGitRepository;
+
+import java.nio.file.Paths;
 
 public class CommandFactory {
     /**
@@ -8,13 +11,15 @@ public class CommandFactory {
      * @return vastava Command isendi
      */
     public static Command createCommand(String commandName, String[] arg) {
+        MiniGitRepository miniGitRepository = new MiniGitRepository(System.getProperty("user.dir"));
+
         return switch (commandName) {
-            case "commit" -> new CommitCommand(arg);
-            case "init" -> new InitCommand(arg);
-            case "checkout" -> new CheckoutCommand(arg);
-            case "tag" -> new TagCommand(arg);
-            case "rm" -> new RmCommand(arg);
-            case "add" -> new AddCommand(arg);
+            case "commit" -> new CommitCommand(arg, miniGitRepository);
+            case "init" -> new InitCommand(arg, miniGitRepository);
+            case "checkout" -> new CheckoutCommand(arg, miniGitRepository);
+            case "tag" -> new TagCommand(arg, miniGitRepository);
+            case "rm" -> new RmCommand(arg, miniGitRepository);
+            case "add" -> new AddCommand(arg, miniGitRepository);
             default -> {
                 System.out.println("not working");
                 yield null;

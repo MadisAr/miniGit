@@ -33,7 +33,7 @@ public class TagCommandTest {
     @Test
     public void testCreateLightweightTag() throws Exception {
         String[] args = {"v-test-lightweight"};
-        TagCommand tagCommand = new TagCommand(args);
+        TagCommand tagCommand = new TagCommand(args, null);
         ResultDTO result = tagCommand.execute();
 
         assertTrue(result.isSuccess());
@@ -48,7 +48,7 @@ public class TagCommandTest {
     @Test
     public void testCreateAnnotatedTag() throws Exception {
         String[] args = {"-a", "v-test-annotated"};
-        TagCommand tagCommand = new TagCommand(args);
+        TagCommand tagCommand = new TagCommand(args, null);
         ResultDTO result = tagCommand.execute();
 
         assertTrue(result.isSuccess());
@@ -74,7 +74,7 @@ public class TagCommandTest {
         Files.writeString(tagFile, "1234567890abcdef\n");
 
         String[] args = {};
-        TagCommand tagCommand = new TagCommand(args);
+        TagCommand tagCommand = new TagCommand(args, null);
         ResultDTO result = tagCommand.execute();
 
         assertTrue(result.isSuccess());

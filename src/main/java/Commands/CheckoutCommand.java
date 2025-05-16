@@ -19,8 +19,8 @@ import java.nio.file.Paths;
 // TODO teha nii et ei tule alati NULL lopuks return, praegu treecheckout errorid neelatakse alla
 public class CheckoutCommand extends Command {
 
-    public CheckoutCommand(String[] args) {
-        super(args);
+    public CheckoutCommand(String[] args, MiniGitRepository miniGitRepository) {
+        super(args, miniGitRepository);
     }
 
     @Override
@@ -34,14 +34,13 @@ public class CheckoutCommand extends Command {
         }
     }
 
-    public static String commandCheckout(String[] args)  {
-        MiniGitRepository repo = CreateGitSubdirectories.repoFind("");
-        if (repo == null) return "Couldn't find .mgit directory.";
+    public String commandCheckout(String[] args)  {
+        if (super.getMinigitRepository() == null) return "couldn't find .mgit directory.";
 
-        CommitObject commitObject = (CommitObject) ReadObject.readObject(repo, args[0]);
+        CommitObject commitObject = (CommitObject) ReadObject.readObject(super.getMinigitRepository(), args[0]);
         if (commitObject == null) return "Couldn't find commit hash from .mgit directory.";
 
-        TreeObject treeObject = (TreeObject) ReadObject.readObject(repo, commitObject.getContent().get("tree"));
+        TreeObject treeObject = (TreeObject) ReadObject.readObject(super.getMinigitRepository(), commitObject.getContent().get("tree"));
         if (treeObject == null) return "Something went wrong, sorry :)";
 
         Path path = Path.of(args[1]);
@@ -59,13 +58,13 @@ public class CheckoutCommand extends Command {
         }
 
         try {
-            return treeCheckout(repo, treeObject, args[1]);
+            return treeCheckout(super.getMinigitRepository(), treeObject, args[1]);
         } catch (IOException e) {
             return e.getMessage();
         }
     }
 
-    public static String treeCheckout(MiniGitRepository repo, TreeObject tree, String path) throws IOException {
+    public String treeCheckout(MiniGitRepository repo, TreeObject tree, String path) throws IOException {
         for (TreeDTO o : tree.getContent()) {
             MGitObject obj = ReadObject.readObject(repo, o.sha());
             File dest = Paths.get(path).resolve(new String(o.path())).toFile();// vblla peaks olema global path?

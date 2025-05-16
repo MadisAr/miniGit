@@ -16,8 +16,8 @@ import java.security.NoSuchAlgorithmException;
 
 public class TagCommand extends Command{
 
-    public TagCommand(String[] args) {
-        super(args);
+    public TagCommand(String[] args, MiniGitRepository miniGitRepository) {
+        super(args, miniGitRepository);
     }
 
     @Override

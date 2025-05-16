@@ -11,8 +11,8 @@ import static UtilityMethods.CreateGitSubdirectories.createGitSubdirectories;
 
 public class InitCommand extends Command {
 
-    public InitCommand(String[] args) {
-        super(args);
+    public InitCommand(String[] args, MiniGitRepository miniGitRepository) {
+        super(args, miniGitRepository);
     }
 
     /**
@@ -40,11 +40,24 @@ public class InitCommand extends Command {
      * @param path kaust kuhu luua .mgit
      * @return
      */
-    MiniGitRepository createRepo(String path) {
-        MiniGitRepository repo = new MiniGitRepository(path);
+    void createRepo(String path) {
+        if (path.equals(".")) path = "";
 
-        File worktreeFile = new File(repo.getWorkTree());
-        File gitDirFile = repo.getGitDir().toFile();
+        File worktreeFile = super.getMinigitRepository().getRepoDir().resolve(path).toFile();
+        File gitDirFile = getFile(worktreeFile);
+
+        createGitSubdirectories(gitDirFile, "branches");
+        createGitSubdirectories(gitDirFile, "objects");
+        createGitSubdirectories(gitDirFile, "refs", "tags");
+        createGitSubdirectories(gitDirFile, "refs", "headers");
+        try {
+            Files.writeString(super.getMinigitRepository().getRepoDir().resolve(".mgitignore"), ".mgit");
+        } catch (IOException ignored) {
+        }
+    }
+
+    private File getFile(File worktreeFile) {
+        File gitDirFile = super.getMinigitRepository().getGitDir().toFile();
 
         // kui loodav kaust eksisteerib juba
         if (worktreeFile.exists()) {
@@ -60,17 +73,7 @@ public class InitCommand extends Command {
                 throw new RuntimeException("Failed to create directory");
             }
         }
-
-        createGitSubdirectories(gitDirFile, "branches");
-        createGitSubdirectories(gitDirFile, "objects");
-        createGitSubdirectories(gitDirFile, "refs", "tags");
-        createGitSubdirectories(gitDirFile, "refs", "headers");
-        try {
-            Files.writeString(repo.getRepoDir().resolve(".mgitignore"), ".mgit");
-        } catch (IOException ignored) {
-        }
-
-        return repo;
+        return gitDirFile;
     }
 
 

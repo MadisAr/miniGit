@@ -24,7 +24,6 @@ public class AddCommand extends Command {
         super(args, miniGitRepository);
     }
 
-    // TODO siin tegelikult peaks arvestama ka ignoreeritud failidega
     @Override
     public ResultDTO execute() {
         // sama kood mis RmCommandis ma ei tea kas peaks tegema funktsiooni? aga kuhu??
@@ -46,7 +45,6 @@ public class AddCommand extends Command {
             // kui tuleb error siis faili ei eksisteeri ja saame lihtsalt jatkata
             System.out.println("Directory empty");
         }
-
 
         if (!Files.isDirectory(filePath)) {
             try {

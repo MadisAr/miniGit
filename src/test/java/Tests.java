@@ -109,8 +109,7 @@ class Tests {
     void testKvlmParseUnparse() {
         String gitCommitMessage = "213 tree 29ff16c9c14e2652b22f8b78bb08a5a07930c147\n" +
                 "parent 206941306e8a8af65b66eaaaea388a7ae24d49a0\n" +
-                "author Maizi Pulgad <maizipulgad@thb.lt> 1527025023 +0200\n" +
-                "committer Maizi Pulgad <maizipulgad@thb.lt> 1527025044 +0200\n" +
+                "timestamp test\n" +
                 "\n" +
                 "Test commit sonum";
 
@@ -125,8 +124,7 @@ class Tests {
     void testCommitObject() {
         String gitCommitMessage = "213 tree 29ff16c9c14e2652b22f8b78bb08a5a07930c147\n" +
                 "parent 206941306e8a8af65b66eaaaea388a7ae24d49a0\n" +
-                "author Maizi Pulgad <maizipulgad@thb.lt> 1527025023 +0200\n" +
-                "committer Maizi Pulgad <maizipulgad@thb.lt> 1527025044 +0200\n" +
+                "timestamp test\n" +
                 "\n" +
                 "Test commit sonum";
         CommitObject commitObject = new CommitObject(gitCommitMessage.getBytes());
@@ -208,7 +206,7 @@ class Tests {
 
         String sha = "a1b2c3d4e5f678901234567890abcdefabcdef12";
         String format = "commit";
-        String content = "tree 0123456789abcdef0123456789abcdef01234567\nparent test\nauthor test\ncommiter test\n\nTest commit";
+        String content = "tree 0123456789abcdef0123456789abcdef01234567\nparent test\ntimestamp test\nTest commit";
 
         File objectsDir = new File(gitDir, "objects");
         objectsDir.mkdirs();

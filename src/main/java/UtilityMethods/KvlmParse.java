@@ -37,7 +37,7 @@ public class KvlmParse {
 
         String[] keys = data.keySet().toArray(new String[0]);
         String[] vals = data.values().toArray(new String[0]);
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 3; i++) {
             dataString.append(keys[i]).append(" ").append(vals[i]).append("\n");
         }
         dataString.append("\n").append(vals[vals.length - 1]);

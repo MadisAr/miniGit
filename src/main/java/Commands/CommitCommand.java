@@ -19,6 +19,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import Objects.MiniGitRepository;
 
 public class CommitCommand extends Command {
 
@@ -169,6 +170,7 @@ public class CommitCommand extends Command {
         return parent != null ? parent.toString() : "";
     }
 
+
     private static String getFileBasename(String filePath) {
         if (filePath == null || filePath.isEmpty()) {
             return "";
@@ -179,8 +181,8 @@ public class CommitCommand extends Command {
     }
 
 
-    public CommitCommand(String[] args) {
-        super(args);
+    public CommitCommand(String[] args, MiniGitRepository miniGitRepository) {
+        super(args, miniGitRepository);
     }
 
 }

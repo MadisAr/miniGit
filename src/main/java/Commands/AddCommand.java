@@ -20,16 +20,21 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 public class AddCommand extends Command {
-    public AddCommand(String[] args) {
-        super(args);
+    public AddCommand(String[] args, MiniGitRepository miniGitRepository) {
+        super(args, miniGitRepository);
     }
 
     @Override
     public ResultDTO execute() {
         // sama kood mis RmCommandis ma ei tea kas peaks tegema funktsiooni? aga kuhu??
-        MiniGitRepository miniGitRepository = new MiniGitRepository(System.getProperty("user.dir"));
+        MiniGitRepository miniGitRepository = super.getMinigitRepository();
+        try {
+            miniGitRepository.findIgnored();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
 
-        String pathString = getArgs()[0];
+        String pathString = getArgs()[0].equals(".") ? "" : getArgs()[0];
         Path filePath = miniGitRepository.getRepoDir().resolve(pathString);
 
         // versioon peaks meil alati 2 olema
@@ -37,10 +42,10 @@ public class AddCommand extends Command {
         try {
             mGitIndex.read();
         } catch (Exception e) {
-            return new ResultDTO(false, e.getMessage(), null);
+            // kui tuleb error siis faili ei eksisteeri ja saame lihtsalt jatkata
+            System.out.println("Directory empty");
         }
 
-        System.out.println(mGitIndex.getEntries());
         if (!Files.isDirectory(filePath)) {
             try {
                 updateFile(filePath, mGitIndex, miniGitRepository);
@@ -63,10 +68,7 @@ public class AddCommand extends Command {
 
 
         mGitIndex.write();
-        System.out.println(mGitIndex.getEntries());
-        return new
-
-                ResultDTO(true, "added file(s)", null);
+        return new ResultDTO(true, "added file(s)", null);
     }
 
 

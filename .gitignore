@@ -36,6 +36,7 @@ build/
 ### Mac OS ###
 .DS_Store
 
+.mgit.backup
 .mgitignore
 .mgit
 testDir/

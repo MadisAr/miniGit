@@ -5,6 +5,7 @@ import java.util.Arrays;
 
 public class Main {
     public static void main(String[] args) {
+        System.out.println(Arrays.toString(args));
         String commandName = args[0];
         args = Arrays.copyOfRange(args, 1, args.length);
         Command command = CommandFactory.createCommand(commandName, args);

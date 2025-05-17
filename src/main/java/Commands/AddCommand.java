@@ -24,7 +24,6 @@ public class AddCommand extends Command {
         super(args);
     }
 
-    // TODO siin tegelikult peaks arvestama ka ignoreeritud failidega
     @Override
     public ResultDTO execute() {
         // sama kood mis RmCommandis ma ei tea kas peaks tegema funktsiooni? aga kuhu??

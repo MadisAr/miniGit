@@ -1,8 +1,10 @@
 package Objects;
 
 import Objects.MGitObjects.MGitObject;
+import UtilityMethods.CreateGitSubdirectories;
 import UtilityMethods.ReadObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -163,5 +165,20 @@ public class MiniGitRepository {
         // kui parenteid rohkem pole oleme joudnud failitee algusesse jarelikult polnud fail meie repo kaustas
         // hetkel tagastan false aga vblla peaks errori viskama?
         return false;
+    }
+
+
+    /**
+     * Tagastab hetkel aktiivse branchi
+     * @return aktiivne branch
+     * @throws IOException
+     */
+    public String getActiveBranch() throws IOException {
+        File repoFile = CreateGitSubdirectories.repoFile(gitDir, "HEAD");
+        String data = Files.readString(repoFile.toPath());
+
+        if (data.startsWith("ref: refs/heads/")) {
+            return data.substring(16, data.length() - 2);
+        } else return null;
     }
 }

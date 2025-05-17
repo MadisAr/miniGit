@@ -8,7 +8,6 @@ import java.util.StringJoiner;
 
 public class TagObject extends CommitObject { // idk kas see on hea mote
     private final String format = "tag";
-    private final Map<String, String> kvlm = new LinkedHashMap<>();
     private String message = "";
 
 
@@ -16,9 +15,6 @@ public class TagObject extends CommitObject { // idk kas see on hea mote
         super(data);
     }
 
-    public void set(String key, String value) {
-        kvlm.put(key, value);
-    }
 
     public void setMessage(String message) {
         this.message = message;

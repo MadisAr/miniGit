@@ -40,7 +40,6 @@ public class AddCommand extends Command {
             return new ResultDTO(false, e.getMessage(), null);
         }
 
-
         System.out.println(mGitIndex.getEntries());
         if (!Files.isDirectory(filePath)) {
             try {

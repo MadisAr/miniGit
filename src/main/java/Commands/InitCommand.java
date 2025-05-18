@@ -49,9 +49,10 @@ public class InitCommand extends Command {
         createGitSubdirectories(gitDirFile, "branches");
         createGitSubdirectories(gitDirFile, "objects");
         createGitSubdirectories(gitDirFile, "refs", "tags");
-        createGitSubdirectories(gitDirFile, "refs", "headers");
+        createGitSubdirectories(gitDirFile, "refs", "heads");
         try {
-            Files.writeString(super.getMinigitRepository().getRepoDir().resolve(".mgitignore"), ".mgit");
+            Files.writeString(super.getMinigitRepository().getRepoDir().resolve(".mgitignore"), ".mgit\n");
+            Files.writeString(super.getMinigitRepository().getGitDir().resolve("HEAD"), "ref: refs/heads/master\n");
         } catch (IOException ignored) {
         }
     }

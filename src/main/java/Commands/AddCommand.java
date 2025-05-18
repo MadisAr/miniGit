@@ -46,7 +46,7 @@ public class AddCommand extends Command {
             // kui tuleb error siis faili ei eksisteeri ja saame lihtsalt jatkata
             System.out.println("Directory empty");
         }
-
+        System.out.println(mGitIndex.getEntries());
 
         if (!Files.isDirectory(filePath)) {
             try {
@@ -67,6 +67,7 @@ public class AddCommand extends Command {
                 return new ResultDTO(false, e.getMessage(), null);
             }
         }
+        System.out.println(mGitIndex.getEntries());
 
 
         mGitIndex.write();

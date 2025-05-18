@@ -57,7 +57,8 @@ public class CreateGitSubdirectories {
     public static File createGitDirsAndFile(File DirFile, String... paths) throws IOException {
         String[] dirs = Arrays.copyOfRange(paths, 0, paths.length - 1);
         File subFile = repoFile(DirFile.toPath(), dirs);
-        if (!subFile.mkdirs()) throw new RuntimeException("Failed to create subdirectory at path: " + subFile);
+        subFile.mkdirs();
+        //if (!subFile.mkdirs()) throw new RuntimeException("Failed to create subdirectory at path: " + subFile);
         File file = new File(subFile, paths[paths.length - 1]);
         file.createNewFile();
         return file;

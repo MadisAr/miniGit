@@ -183,7 +183,7 @@ public class MiniGitRepository {
         }
 
         if (data.startsWith("ref: refs/heads/")) {
-            return data.substring(16, data.length() - 2);
+            return data.substring(16, data.length() - 1);
         } else return null;
     }
 }

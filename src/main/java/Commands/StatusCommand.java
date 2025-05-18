@@ -197,7 +197,7 @@ public class StatusCommand extends Command {
         if (activeBranch != null) {
             System.out.println(String.format("On branch %", activeBranch));
         } else {
-            System.out.println(String.format("HEAD detached at %", CreateGitSubdirectories.repoFind("HEAD")));
+            System.out.println(String.format("HEAD detached at %", miniGitRepository.findObject("HEAD", null)));
         }
     }
 

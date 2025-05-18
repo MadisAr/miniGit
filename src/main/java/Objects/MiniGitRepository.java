@@ -177,7 +177,10 @@ public class MiniGitRepository {
      */
     public String getActiveBranch() throws IOException {
         File repoFile = CreateGitSubdirectories.repoFile(gitDir, "HEAD");
-        String data = Files.readString(repoFile.toPath());
+        String data = "";
+        if (Files.isRegularFile(repoFile.toPath())) {
+            data = Files.readString(repoFile.toPath());
+        }
 
         if (data.startsWith("ref: refs/heads/")) {
             return data.substring(16, data.length() - 2);

@@ -20,6 +20,8 @@ public class CommandFactory {
             case "tag" -> new TagCommand(arg, miniGitRepository);
             case "rm" -> new RmCommand(arg, miniGitRepository);
             case "add" -> new AddCommand(arg, miniGitRepository);
+            case "status" -> new StatusCommand(arg, miniGitRepository);
+            case "check-ignore" -> new CheckIgnoreCommand(arg, miniGitRepository);
             default -> {
                 System.out.println("not working");
                 yield null;

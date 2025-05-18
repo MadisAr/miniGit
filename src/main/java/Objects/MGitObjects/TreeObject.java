@@ -38,4 +38,8 @@ public class TreeObject extends MGitObject{
     public String getFormat() {
         return format;
     }
+
+    public void addItem(TreeDTO item) {
+        this.items.add(item);
+    }
 }

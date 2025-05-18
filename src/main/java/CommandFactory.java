@@ -15,6 +15,8 @@ public class CommandFactory {
             case "tag" -> new TagCommand(arg);
             case "rm" -> new RmCommand(arg);
             case "add" -> new AddCommand(arg);
+            case "status" -> new StatusCommand(arg);
+            case "check-ignore" -> new CheckIgnoreCommand(arg);
             default -> {
                 System.out.println("not working");
                 yield null;

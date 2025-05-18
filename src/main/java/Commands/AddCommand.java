@@ -104,7 +104,7 @@ public class AddCommand extends Command {
         FileTime mTime = basicFileAttributes.lastModifiedTime();
         int cTimeSeconds = (int) cTime.toInstant().getEpochSecond();
         int cTimeNano = (int) cTime.toInstant().getNano();
-        int mTimeSeconds = (int) cTime.toInstant().getEpochSecond();
+        int mTimeSeconds = (int) cTime.toInstant().getEpochSecond(); // TODO siin vist peaks olema mTime!!!!!, mai käpi praegu
         int mTimeNano = (int) cTime.toInstant().getNano();
 
         // seame default vaartused, ma ei ole kindel kuidas dev ja ino leida

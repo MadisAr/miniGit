@@ -134,8 +134,8 @@ public class MiniGitRepository {
         List<String> mGitIgnoreLines = Files.readAllLines(repoDir.resolve(".mgitignore"));
 
         for (String mGitIgnoreLine : mGitIgnoreLines) {
-            if (!mGitIgnoreLine.isEmpty() && !(mGitIgnoreLine.charAt(0) == '#')) {
-                ignoredFiles.add(repoDir.resolve(mGitIgnoreLine));
+            if (!mGitIgnoreLine.isEmpty() && mGitIgnoreLine.charAt(0) == '#' && !ignoredFiles.contains(repoDir.resolve(mGitIgnoreLine))) {
+                ignoredFiles.add(repoDir.resolve(mGitIgnoreLine.substring(1, mGitIgnoreLine.length() - 1)));
             }
         }
     }
@@ -152,7 +152,7 @@ public class MiniGitRepository {
         if (!Files.exists(filePath)) throw new RuntimeException("File not found");
 
         Path fileParent = filePath;
-        if (ignoredFiles.contains(fileParent)) return true;
+        if (ignoredFiles.contains(fileParent)) return true; // TODO MIKS SEE EI TOOTA!!!???!!
 
         while ((fileParent = fileParent.getParent()) != null) {
             // kui oleme joudnud repo programmi juurkaustani tagastame false

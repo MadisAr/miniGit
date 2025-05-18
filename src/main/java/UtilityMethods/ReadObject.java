@@ -7,6 +7,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.zip.InflaterInputStream;
@@ -33,6 +34,7 @@ public class ReadObject {
             return null;
         }
 
+        System.out.println(new String(decompressedBytes));
 
         // loe baidireast objekti tyyp/format
         int spaceIndex = findFirstChar(decompressedBytes, (byte) ' ', 0);

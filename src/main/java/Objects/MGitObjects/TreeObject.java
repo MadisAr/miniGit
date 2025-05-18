@@ -4,6 +4,13 @@ import Objects.MiniGitRepository;
 import Objects.DTO.TreeDTO;
 import UtilityMethods.ParseTree;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HexFormat;
 import java.util.List;
 
 public class TreeObject extends MGitObject{
@@ -12,12 +19,30 @@ public class TreeObject extends MGitObject{
 
     public TreeObject(byte[] data) {
         super(data);
+        if (items == null) this.items = new ArrayList<>();
     }
+
 
     @Override
     public String serialize(MiniGitRepository repo) {
-        return ""; // todo hetkel katki vist
+        items.sort(ParseTree.treeDTOComparator);
+
+        try (var out = new ByteArrayOutputStream()) {
+            for (TreeDTO item : items) {
+                out.write(item.mode());
+                out.write(' ');
+                out.write(item.path());
+                out.write(0);
+                out.write(item.sha().getBytes());
+            }
+            byte[] content = out.toByteArray();
+            return new String(content);
+        } catch (IOException e) {
+            throw new UncheckedIOException("Tree serialization failed", e);
+        }
     }
+
+
 
     @Override
     public void deserialize(byte[] data) {

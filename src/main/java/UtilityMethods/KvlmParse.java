@@ -24,6 +24,7 @@ public class KvlmParse {
         // NB! esimesed kolm rida commitis on tree, parent ja timestamp (author ja commiter ei ole!, muidu on nende sees timestamp), lisame loopiga
         for (int i = 0; i < 3; i++) {
             String[] entry = dataList[i].split(" ", 2);
+            System.out.println(Arrays.toString(entry));
             dataMap.put(entry[0], entry[1]);
         }
 
@@ -38,7 +39,7 @@ public class KvlmParse {
         String[] keys = data.keySet().toArray(new String[0]);
         String[] vals = data.values().toArray(new String[0]);
         for (int i = 0; i < 3; i++) {
-            dataString.append(keys[i]).append(" ").append(vals[i]).append("\n");
+            dataString.append(keys[i].strip()).append(" ").append(vals[i].strip()).append("\n");
         }
         dataString.append("\n").append(vals[vals.length - 1]);
 

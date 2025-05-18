@@ -15,8 +15,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
@@ -58,24 +61,30 @@ public class CommitCommand extends Command {
         // hetkeaeg
         Instant now = Instant.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-        String formattedTime = formatter.format(now);
+        ZonedDateTime zonedNow = now.atZone(ZoneId.systemDefault());
+        String formattedTime = formatter.format(zonedNow);
 
         String message = super.getArgs()[0];
+        String parent = "null";
+        try {
+            parent = miniGitRepository.findObject("HEAD", null);
+        } catch (Exception ignored) {}
+
 
         // loob CommitObjecti
         String commit = createCommit(
                 miniGitRepository,
                 rootTreeSHA,
-                miniGitRepository.findObject("HEAD", null),
+                parent,
                 formattedTime,
                 message);
 
         // updateib HEAD-i, see commit nüüd lõpus
         String activeBranch = miniGitRepository.getActiveBranch();
         if (activeBranch != null) { // kui branchil, siis update refs/heads/BRANCH
-            Path path = Paths.get("refs/heads").resolve(Paths.get(activeBranch)).toAbsolutePath();
+            Path path = Paths.get(".mgit/refs/heads").resolve(Paths.get(activeBranch)).toAbsolutePath();
             File repoFile = CreateGitSubdirectories.repoFile(miniGitRepository.getRepoDir(), path.toString());
-            Files.writeString(repoFile.toPath(), commit + "\n");
+            Files.writeString(repoFile.toPath(), commit + "\n", StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } else { // muidu update HEAD
             File repoFile = CreateGitSubdirectories.repoFile(miniGitRepository.getRepoDir(), "HEAD");
             Files.writeString(repoFile.toPath(),"\n");
@@ -116,7 +125,7 @@ public class CommitCommand extends Command {
         for (MGitIndexEntry mGitIndexEntry : mGitIndex.getEntries()) {
             String dirname = getParentDirectory(mGitIndexEntry.name());
             String key = dirname;
-            while (!key.equals("")) {
+            while (!key.isEmpty()) {
                 if (!contents.containsKey(key)) {
                     contents.put(key, new ArrayList<>());
                 }
@@ -125,14 +134,14 @@ public class CommitCommand extends Command {
             contents.get(dirname).add(mGitIndexEntry);
         }
 
-        List<String> sortedPaths = (List<String>) contents.keySet();
+        List<String> sortedPaths = new ArrayList<>(contents.keySet());
         sortedPaths.sort((a, b) -> Integer.compare(b.length(), a.length()));
 
-        String SHA = null;
+        String sha = null;
 
         // teeb puudest hashi, ehk nt path4 võib olla suvakas hash 3049380498309482 vms, ja nii genetakse rootini
         for (String path : sortedPaths) {
-            TreeObject treeObject = null;
+            TreeObject treeObject = new TreeObject(null);
             for (Object entry : contents.get(path)) {
                 TreeDTO leaf;
 
@@ -146,7 +155,7 @@ public class CommitCommand extends Command {
                 treeObject.addItem(leaf);
             }
 
-            String sha = WriteObject.writeObject(miniGitRepository, treeObject);
+            sha = WriteObject.writeObject(miniGitRepository, treeObject);
 
             // lisab parentile hetkelise puu ehk (basename, sha)
             String parent = getParentDirectory(path);
@@ -157,7 +166,7 @@ public class CommitCommand extends Command {
             contents.get(parent).add(valuePair);
         }
 
-        return SHA;
+        return sha;
     }
 
     private static String getParentDirectory(String filePath) {

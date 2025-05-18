@@ -180,7 +180,7 @@ public class MiniGitRepository {
         String data = Files.readString(repoFile.toPath());
 
         if (data.startsWith("ref: refs/heads/")) {
-            return data.substring(16, data.length() - 2);
+            return data.substring(16, data.length() - 1);
         } else return null;
     }
 }

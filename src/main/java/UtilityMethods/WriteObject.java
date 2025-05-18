@@ -24,32 +24,39 @@ public class WriteObject {
         String data = mGitObject.serialize(miniGitRepository);
 
         // teeme byteArrayOutputStream ja lisame sinna jäjrest byte'e
-        ByteArrayOutputStream result = new ByteArrayOutputStream();
-        result.write(mGitObject.getFormat().getBytes(StandardCharsets.UTF_8));
-        result.write(' ');
-        result.write(Integer.toString(data.length()).getBytes(StandardCharsets.UTF_8));
-        result.write((byte) 0);
-        result.write(data.getBytes(StandardCharsets.UTF_8));
+        try (ByteArrayOutputStream result = new ByteArrayOutputStream()) {
+            result.write(mGitObject.getFormat().getBytes(StandardCharsets.UTF_8));
+            result.write(' ');
+            result.write(Integer.toString(data.length()).getBytes(StandardCharsets.UTF_8));
+            result.write((byte) 0);
+            result.write(data.getBytes(StandardCharsets.UTF_8));
 
-        MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
-        byte[] hashedBytes = sha1.digest(result.toByteArray());
-        StringBuilder sb = new StringBuilder();
-        for (byte b : hashedBytes) {
-            sb.append(String.format("%02x", b));
+
+            MessageDigest sha1 = MessageDigest.getInstance("SHA-1");
+            byte[] hashedBytes = sha1.digest(result.toByteArray());
+            StringBuilder sb = new StringBuilder();
+            for (byte b : hashedBytes) {
+                sb.append(String.format("%02x", b));
+            }
+            String sha = sb.toString();
+
+            //TODO tegelt ei taha kirjutada ikka?
+//         teeme antud andmetest uued alamkaustad
+            File repoFile = miniGitRepository.getGitDir().toFile();
+            File file = createGitDirsAndFile(repoFile,"objects", sha.substring(0, 2), sha.substring(2));
+
+            byte[] resultBytes = compress(result.toByteArray());
+
+//            if (!file.exists()) {
+//                try (FileOutputStream fos = new FileOutputStream(file)) {
+//                    fos.write(resultBytes);
+//                }
+//            }
+            try (FileOutputStream fos = new FileOutputStream(file)) {
+                fos.write(resultBytes);
+            }
+            return sha;
         }
-        String sha = sb.toString();
-
-        // teeme antud andmetest uued alamkaustad
-        File repoFile = miniGitRepository.getGitDir().toFile();
-        File file = createGitDirsAndFile(repoFile,"objects", sha.substring(0, 2), sha.substring(2));
-
-        byte[] resultBytes = compress(result.toByteArray());
-
-        try (FileOutputStream fos = new FileOutputStream(file)) {
-            fos.write(resultBytes);
-        }
-
-        return sha;
     }
 
     public static byte[] compress(byte[] data) throws IOException {

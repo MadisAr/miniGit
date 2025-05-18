@@ -28,13 +28,12 @@ public class CheckoutCommand extends Command {
         String result = commandCheckout(getArgs());
         if (result == null) {
             return new ResultDTO(true, "Checkout succesful, commit instantiated at " + getArgs()[1], null);
-        }
-        else {
+        } else {
             return new ResultDTO(false, result, null);
         }
     }
 
-    public String commandCheckout(String[] args)  {
+    public String commandCheckout(String[] args) {
         if (super.getMinigitRepository() == null) return "couldn't find .mgit directory.";
 
         CommitObject commitObject = (CommitObject) ReadObject.readObject(super.getMinigitRepository(), args[0]);
@@ -68,7 +67,6 @@ public class CheckoutCommand extends Command {
         for (TreeDTO o : tree.getContent()) {
             MGitObject obj = ReadObject.readObject(repo, o.sha());
             File dest = Paths.get(path).resolve(new String(o.path())).toFile();// vblla peaks olema global path?
-
             if (obj.getFormat().equals("tree")) {
                 dest.mkdir();
                 treeCheckout(repo, (TreeObject) obj, dest.toString());

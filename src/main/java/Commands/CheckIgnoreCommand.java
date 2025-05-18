@@ -3,6 +3,7 @@ package Commands;
 import Objects.DTO.ResultDTO;
 import Objects.MiniGitRepository;
 
+import java.nio.file.Files;
 import java.nio.file.Paths;
 
 public class CheckIgnoreCommand extends Command {
@@ -15,11 +16,13 @@ public class CheckIgnoreCommand extends Command {
         MiniGitRepository miniGitRepository = new MiniGitRepository(System.getProperty("user.dir"));
 
         for (String path : this.getArgs()) {
-            if (!miniGitRepository.isFileIgnored(Paths.get(path))) {
-                System.out.println(path);
+            if (Files.isRegularFile(Paths.get(path))) {
+                if (!miniGitRepository.isFileIgnored(Paths.get(path))) {
+                    System.out.println(path);
+                }
             }
         }
 
-        return null;
+        return new ResultDTO(true, "file(s) check-ignored", null);
     }
 }

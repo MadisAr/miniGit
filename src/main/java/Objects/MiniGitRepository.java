@@ -1,8 +1,10 @@
 package Objects;
 
 import Objects.MGitObjects.MGitObject;
+import UtilityMethods.CreateGitSubdirectories;
 import UtilityMethods.ReadObject;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -132,8 +134,8 @@ public class MiniGitRepository {
         List<String> mGitIgnoreLines = Files.readAllLines(repoDir.resolve(".mgitignore"));
 
         for (String mGitIgnoreLine : mGitIgnoreLines) {
-            if (!mGitIgnoreLine.isEmpty() && !(mGitIgnoreLine.charAt(0) == '#')) {
-                ignoredFiles.add(repoDir.resolve(mGitIgnoreLine));
+            if (!mGitIgnoreLine.isEmpty() && mGitIgnoreLine.charAt(0) == '#' && !ignoredFiles.contains(repoDir.resolve(mGitIgnoreLine))) {
+                ignoredFiles.add(repoDir.resolve(mGitIgnoreLine.substring(1, mGitIgnoreLine.length() - 1)));
             }
         }
     }
@@ -150,7 +152,7 @@ public class MiniGitRepository {
         if (!Files.exists(filePath)) throw new RuntimeException("File not found");
 
         Path fileParent = filePath;
-        if (ignoredFiles.contains(fileParent)) return true;
+        if (ignoredFiles.contains(fileParent)) return true; // TODO MIKS SEE EI TOOTA!!!???!!
 
         while ((fileParent = fileParent.getParent()) != null) {
             // kui oleme joudnud repo programmi juurkaustani tagastame false
@@ -163,5 +165,20 @@ public class MiniGitRepository {
         // kui parenteid rohkem pole oleme joudnud failitee algusesse jarelikult polnud fail meie repo kaustas
         // hetkel tagastan false aga vblla peaks errori viskama?
         return false;
+    }
+
+
+    /**
+     * Tagastab hetkel aktiivse branchi
+     * @return aktiivne branch
+     * @throws IOException
+     */
+    public String getActiveBranch() throws IOException {
+        File repoFile = CreateGitSubdirectories.repoFile(gitDir, "HEAD");
+        String data = Files.readString(repoFile.toPath());
+
+        if (data.startsWith("ref: refs/heads/")) {
+            return data.substring(16, data.length() - 2);
+        } else return null;
     }
 }

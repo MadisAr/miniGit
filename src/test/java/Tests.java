@@ -19,12 +19,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -110,8 +112,7 @@ class Tests {
     void testKvlmParseUnparse() {
         String gitCommitMessage = "213 tree 29ff16c9c14e2652b22f8b78bb08a5a07930c147\n" +
                 "parent 206941306e8a8af65b66eaaaea388a7ae24d49a0\n" +
-                "author Maizi Pulgad <maizipulgad@thb.lt> 1527025023 +0200\n" +
-                "committer Maizi Pulgad <maizipulgad@thb.lt> 1527025044 +0200\n" +
+                "timestamp test\n" +
                 "\n" +
                 "Test commit sonum";
 
@@ -126,8 +127,7 @@ class Tests {
     void testCommitObject() {
         String gitCommitMessage = "213 tree 29ff16c9c14e2652b22f8b78bb08a5a07930c147\n" +
                 "parent 206941306e8a8af65b66eaaaea388a7ae24d49a0\n" +
-                "author Maizi Pulgad <maizipulgad@thb.lt> 1527025023 +0200\n" +
-                "committer Maizi Pulgad <maizipulgad@thb.lt> 1527025044 +0200\n" +
+                "timestamp test\n" +
                 "\n" +
                 "Test commit sonum";
         CommitObject commitObject = new CommitObject(gitCommitMessage.getBytes());
@@ -189,7 +189,12 @@ class Tests {
 
         // kirjutame .mgitignore faili sisu
         List<String> ignoreLines = List.of("secret.txt", "ignoreme");
-        Files.write(tempDir.resolve(".mgitignore"), ignoreLines);
+        List<String> hashtaggedIgnoreLines = new ArrayList<>();
+        for (String ignoreLine : ignoreLines) {
+            hashtaggedIgnoreLines.add("#"+ignoreLine);
+        }
+
+        Files.write(tempDir.resolve(".mgitignore"), hashtaggedIgnoreLines);
 
         MiniGitRepository repo = new MiniGitRepository(tempDir.toString());
         repo.findIgnored();
@@ -209,7 +214,7 @@ class Tests {
 
         String sha = "a1b2c3d4e5f678901234567890abcdefabcdef12";
         String format = "commit";
-        String content = "tree 0123456789abcdef0123456789abcdef01234567\nparent test\nauthor test\ncommiter test\n\nTest commit";
+        String content = "tree 0123456789abcdef0123456789abcdef01234567\nparent test\ntimestamp test\nTest commit";
 
         File objectsDir = new File(gitDir, "objects");
         objectsDir.mkdirs();

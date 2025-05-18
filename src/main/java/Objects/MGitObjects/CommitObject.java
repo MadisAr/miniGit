@@ -4,11 +4,14 @@ import Objects.MiniGitRepository;
 import UtilityMethods.KvlmParse;
 
 import java.nio.charset.StandardCharsets;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class CommitObject extends MGitObject {
+    protected final Map<String, String> kvlm = new LinkedHashMap<>();
     private Map<String, String> content;
     private final String format = "commit";
+
 
     @Override
     public Map<String, String> getContent() {
@@ -39,4 +42,10 @@ public class CommitObject extends MGitObject {
     public void deserialize(byte[] data) {
         content = KvlmParse.KvlmParse(data);
     }
+
+    public void set(String key, String value) {
+        kvlm.put(key, value);
+    }
 }
+
+
